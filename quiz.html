@@ -194,34 +194,53 @@ ol { padding-left:20px; margin-top:8px; }
 
 <script>
 const companies = [
-  // Data is the same as previous version, with 'category' and 'level' for each item.
-  // NOTE: Celebrity category has no 'Hard' level questions.
   // --------------------- CORE COMPANIES ---------------------
   {company:"Zomato", owner:"Deepinder Goyal", level:"Easy", logo:"https://logo.clearbit.com/zomato.com", category:"Core"},
   {company:"Swiggy", owner:"Sriharsha Majety", level:"Easy", logo:"https://logo.clearbit.com/swiggy.com", category:"Core"},
   {company:"Nykaa", owner:"Falguni Nayar", level:"Easy", logo:"https://logo.clearbit.com/nykaa.com", category:"Core"},
   {company:"Paytm", owner:"Vijay Shekhar Sharma", level:"Easy", logo:"https://logo.clearbit.com/paytm.com", category:"Core"},
+  {company:"Zerodha", owner:"Nithin Kamath", level:"Easy", logo:"https://logo.clearbit.com/zerodha.com", category:"Core"},
+  {company:"Lenskart", owner:"Peyush Bansal", level:"Easy", logo:"https://logo.clearbit.com/lenskart.com", category:"Core"},
+  {company:"BharatPe", owner:"Ashneer Grover & Shashvat Nakrani", level:"Easy", logo:"https://logo.clearbit.com/bharatpe.com", category:"Core"},
+  {company:"Policybazaar", owner:"Yashish Dahiya", level:"Easy", logo:"https://logo.clearbit.com/policybazaar.com", category:"Core"},
   {company:"Flipkart", owner:"Sachin & Binny Bansal", level:"Medium", logo:"https://logo.clearbit.com/flipkart.com", category:"Core"},
   {company:"Ola", owner:"Bhavish Aggarwal", level:"Medium", logo:"https://logo.clearbit.com/olacabs.com", category:"Core"},
   {company:"boAt", owner:"Aman Gupta", level:"Medium", logo:"https://logo.clearbit.com/boat-lifestyle.com", category:"Core"},
   {company:"CRED", owner:"Kunal Shah", level:"Medium", logo:"https://logo.clearbit.com/cred.club", category:"Core"},
+  {company:"OYO", owner:"Ritesh Agarwal", level:"Medium", logo:"https://logo.clearbit.com/oyorooms.com", category:"Core"},
+  {company:"BYJU'S", owner:"Byju Raveendran", level:"Medium", logo:"https://logo.clearbit.com/byjus.com", category:"Core"},
+  {company:"upGrad", owner:"Ronnie Screwvala", level:"Medium", logo:"https://logo.clearbit.com/upgrad.com", category:"Core"},
+  {company:"Dream11", owner:"Harsh Jain & Bhavit Sheth", level:"Medium", logo:"https://logo.clearbit.com/dream11.com", category:"Core"},
   {company:"Hindustan Unilever (HUL)", owner:"Unilever", level:"Hard", logo:"https://logo.clearbit.com/unilever.com", category:"Core"},
   {company:"Dabur India", owner:"Burman Family", level:"Hard", logo:"https://logo.clearbit.com/dabur.com", category:"Core"},
   {company:"Tesla", owner:"Elon Musk", level:"Hard", logo:"https://logo.clearbit.com/tesla.com", category:"Core"},
   {company:"Amazon", owner:"Jeff Bezos", level:"Hard", logo:"https://logo.clearbit.com/amazon.com", category:"Core"},
   {company:"Google", owner:"Larry Page & Sergey Brin", level:"Hard", logo:"https://logo.clearbit.com/google.com", category:"Core"},
+  {company:"Microsoft", owner:"Bill Gates & Paul Allen", level:"Hard", logo:"https://logo.clearbit.com/microsoft.com", category:"Core"},
+  {company:"Tata Group", owner:"Jamsetji Tata", level:"Hard", logo:"https://logo.clearbit.com/tata.com", category:"Core"},
+  {company:"Reliance Industries", owner:"Dhirubhai Ambani", level:"Hard", logo:"https://logo.clearbit.com/ril.com", category:"Core"},
+
   // --------------------- CELEBRITY-OWNED BRANDS (NO HARD LEVEL) ---------------------
   {company:"Being Human", owner:"Salman Khan", level:"Easy", logo:"https://logo.clearbit.com/beinghumanclothing.com", category:"Celebrity"},
   {company:"Ed-a-Mamma", owner:"Alia Bhatt", level:"Easy", logo:"", category:"Celebrity"},
+  {company:"Star Struck", owner:"Sunny Leone", level:"Easy", logo:"https://logo.clearbit.com/starstruckbysl.com", category:"Celebrity"},
+  {company:"Skult", owner:"Shahid Kapoor", level:"Easy", logo:"", category:"Celebrity"},
   {company:"82°E", owner:"Deepika Padukone", level:"Medium", logo:"https://logo.clearbit.com/82e.com", category:"Celebrity"},
   {company:"HRX", owner:"Hrithik Roshan", level:"Medium", logo:"https://logo.clearbit.com/hrxbrand.com", category:"Celebrity"},
   {company:"Kay Beauty", owner:"Katrina Kaif", level:"Medium", logo:"https://logo.clearbit.com/nykaa.com", category:"Celebrity"},
   {company:"Wrogn", owner:"Virat Kohli", level:"Medium", logo:"https://logo.clearbit.com/wrogn.com", category:"Celebrity"},
+  {company:"One8", owner:"Virat Kohli", level:"Medium", logo:"https://logo.clearbit.com/one8.com", category:"Celebrity"},
+  {company:"House of Pataudi", owner:"Saif Ali Khan", level:"Medium", logo:"https://logo.clearbit.com/houseofpataudi.com", category:"Celebrity"},
+
   // --------------------- IPL FRANCHISE OWNERS (ONLY HARD LEVEL) ---------------------
   {company:"Mumbai Indians (MI)", owner:"Reliance Industries (Ambani)", level:"Hard", logo:"https://logo.clearbit.com/mumbaiindians.com", category:"IPL"},
   {company:"Royal Challengers Bengaluru (RCB)", owner:"United Spirits (Diageo)", level:"Hard", logo:"https://logo.clearbit.com/royalchallengers.com", category:"IPL"},
   {company:"Kolkata Knight Riders (KKR)", owner:"Shah Rukh Khan & Mehta Group", level:"Hard", logo:"https://logo.clearbit.com/kkr.in", category:"IPL"},
   {company:"Chennai Super Kings (CSK)", owner:"India Cements (N. Srinivasan)", level:"Hard", logo:"https://logo.clearbit.com/chennaisuperkings.com", category:"IPL"},
+  {company:"Sunrisers Hyderabad (SRH)", owner:"Kalanithi Maran (SUN Group)", level:"Hard", logo:"https://logo.clearbit.com/sunrisershyderabad.in", category:"IPL"},
+  {company:"Punjab Kings (PBKS)", owner:"Preity Zinta & Ness Wadia", level:"Hard", logo:"https://logo.clearbit.com/punjabkingsipl.in", category:"IPL"},
+  {company:"Delhi Capitals (DC)", owner:"JSW Group & GMR Group", level:"Hard", logo:"https://logo.clearbit.com/delhicapitals.in", category:"IPL"},
+  {company:"Rajasthan Royals (RR)", owner:"Manoj Badale (Emerging Media)", level:"Hard", logo:"https://logo.clearbit.com/rajasthanroyals.com", category:"IPL"}
 ];
 
 let quizPool=[], qIndex=0, score=0, timerInterval=null, timeLeft=15;
@@ -241,7 +260,7 @@ const categorySelect = document.getElementById('categorySelect');
 const levelSelect = document.getElementById('levelSelect');
 const selectionContainer = document.getElementById('selectionContainer');
 
-// --- CORRECTED: Functions to dynamically update dropdowns ---
+// --- Functions to dynamically update dropdowns ---
 function updateLevelOptions() {
     const selectedCategory = categorySelect.value;
     const previouslySelectedLevel = levelSelect.value;
@@ -265,7 +284,6 @@ function updateLevelOptions() {
         }
     });
 
-    // Only reset the level selection if the previously selected level is now disabled
     const selectedOptionEl = levelSelect.querySelector(`option[value="${previouslySelectedLevel}"]`);
     if (selectedOptionEl && selectedOptionEl.disabled) {
         levelSelect.value = 'default';
@@ -295,17 +313,14 @@ function updateCategoryOptions() {
         }
     });
     
-    // Only reset the category selection if the previously selected category is now disabled
     const selectedOptionEl = categorySelect.querySelector(`option[value="${previouslySelectedCategory}"]`);
     if (selectedOptionEl && selectedOptionEl.disabled) {
         categorySelect.value = 'default';
     }
 }
 
-// --- Add event listeners to the dropdowns ---
 categorySelect.addEventListener('change', updateLevelOptions);
 levelSelect.addEventListener('change', updateCategoryOptions);
-
 
 function shuffleArray(arr){ return arr.sort(() => Math.random() - 0.5); }
 
