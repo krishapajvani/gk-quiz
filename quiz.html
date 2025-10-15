@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CMAT Company Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg1: #0f172a;
+  --bg2: #081028;
+  --accent: #7af0c9;
+  --accent2: #ffd166;
+  --correct: #4ade80;
+  --wrong: #f87171;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family: 'Inter', sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  background: linear-gradient(135deg,var(--bg1), var(--bg2));
+  overflow:hidden;
+  padding: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.05);
+  padding: 20px 30px;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  color: #e6eef8;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  position: relative;
+}
+
+.selection-container {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.selection-container select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: #021428;
+  color: #e6eef8;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e6eef8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2013l128%20127.9c3.6%203.6%207.8%205.4%2013%205.4s9.4-1.8%2013-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-13%200-5-1.9-9.4-5.4-13.2z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: .65em auto;
+}
+.selection-container select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+/* Style for disabled options */
+.selection-container select option:disabled {
+    color: #999;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border:none;
+  font-weight:700;
+  font-size:16px;
+  background: linear-gradient(90deg,var(--accent), var(--accent2));
+  color: #012;
+  cursor:pointer;
+  margin-bottom: 10px;
+  transition: transform 0.2s, opacity 0.3s;
+}
+.primary-btn:hover { transform: scale(1.05); }
+.primary-btn.hidden { display:none; opacity:0; pointer-events:none; }
+
+.quiz-hero {
+  display:flex;
+  gap: 15px;
+  align-items:center;
+  margin-bottom:15px;
+  transition: all 0.3s;
+}
+
+.logo-box {
+  width:100px; height:100px;
+  border-radius:16px;
+  background:#fff;
+  padding:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.logo-box img { width:100%; height:100%; object-fit:contain; }
+
+.qbox { flex:1; }
+.question { font-size:20px; font-weight:600; margin-bottom:6px; }
+#levelBadge { font-size:13px; color:#9fd8ff66; }
+
+.opts {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:12px;
+}
+.opt {
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.1);
+  background:#021428;
+  cursor:pointer;
+  text-align:center;
+  font-weight:600;
+  transition: all 0.3s;
+}
+.opt:hover { transform:translateY(-3px); box-shadow:0 5px 15px rgba(0,0,0,0.4); }
+
+#timer {
+  font-weight:600;
+  text-align:right;
+  margin-bottom:8px;
+  color:#ffd166;
+}
+
+#resultText { margin-top:12px; font-weight:700; font-size:16px; min-height:24px; }
+ol { padding-left:20px; margin-top:8px; }
+
+.bg-circle {
+  position:absolute;
+  border-radius:50%;
+  opacity:0.1;
+  animation: float 15s infinite linear;
+  z-index: -1;
+}
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg);}
+  50% { transform: translateY(-50px) rotate(180deg);}
+  100% { transform: translateY(0px) rotate(360deg);}
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="selection-container" id="selectionContainer">
+    <select id="categorySelect">
+        <option value="default" disabled selected>Select Category</option>
+        <option value="Core">🏢 Core Companies</option>
+        <option value="Celebrity">⭐ Celebrity Ventures</option>
+        <option value="IPL">🏏 IPL Owners</option>
+        <option value="All">🧠 All Categories</option>
+    </select>
+    <select id="levelSelect">
+        <option value="default" disabled selected>Select Level</option>
+        <option value="Easy">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Hard">Hard</option>
+        <option value="All">All Levels</option>
+    </select>
+  </div>
+
+  <button class="primary-btn" id="btnStart">Start Quiz ▶️</button>
+  <button class="primary-btn hidden" id="btnStop" style="background:#f87171">⏹ Stop Quiz</button>
+  <button class="primary-btn" onclick="location.href='index.html'" style="background:#888">🏠 Back to Dashboard</button>
+
+  <div id="timer" style="display:none">⏳ 15s</div>
+
+  <div class="quiz-hero" style="display:none">
+    <div class="logo-box" id="quizLogo"><img src="" alt="Company Logo"></div>
+    <div class="qbox">
+      <div class="question" id="questionText">Question here</div>
+      <div id="levelBadge">Level: —</div>
+    </div>
+  </div>
+
+  <div class="opts" id="optionsWrap"></div>
+  <button class="primary-btn hidden" id="btnNext">Next ➡️</button>
+  <div id="resultText"></div>
+</div>
+
+<script>
+const companies = [
+  // Data is the same as previous version, with 'category' and 'level' for each item.
+  // NOTE: Celebrity category has no 'Hard' level questions.
+  // --------------------- CORE COMPANIES ---------------------
+  {company:"Zomato", owner:"Deepinder Goyal", level:"Easy", logo:"https://logo.clearbit.com/zomato.com", category:"Core"},
+  {company:"Swiggy", owner:"Sriharsha Majety", level:"Easy", logo:"https://logo.clearbit.com/swiggy.com", category:"Core"},
+  {company:"Nykaa", owner:"Falguni Nayar", level:"Easy", logo:"https://logo.clearbit.com/nykaa.com", category:"Core"},
+  {company:"Paytm", owner:"Vijay Shekhar Sharma", level:"Easy", logo:"https://logo.clearbit.com/paytm.com", category:"Core"},
+  {company:"Flipkart", owner:"Sachin & Binny Bansal", level:"Medium", logo:"https://logo.clearbit.com/flipkart.com", category:"Core"},
+  {company:"Ola", owner:"Bhavish Aggarwal", level:"Medium", logo:"https://logo.clearbit.com/olacabs.com", category:"Core"},
+  {company:"boAt", owner:"Aman Gupta", level:"Medium", logo:"https://logo.clearbit.com/boat-lifestyle.com", category:"Core"},
+  {company:"CRED", owner:"Kunal Shah", level:"Medium", logo:"https://logo.clearbit.com/cred.club", category:"Core"},
+  {company:"Hindustan Unilever (HUL)", owner:"Unilever", level:"Hard", logo:"https://logo.clearbit.com/unilever.com", category:"Core"},
+  {company:"Dabur India", owner:"Burman Family", level:"Hard", logo:"https://logo.clearbit.com/dabur.com", category:"Core"},
+  {company:"Tesla", owner:"Elon Musk", level:"Hard", logo:"https://logo.clearbit.com/tesla.com", category:"Core"},
+  {company:"Amazon", owner:"Jeff Bezos", level:"Hard", logo:"https://logo.clearbit.com/amazon.com", category:"Core"},
+  {company:"Google", owner:"Larry Page & Sergey Brin", level:"Hard", logo:"https://logo.clearbit.com/google.com", category:"Core"},
+  // --------------------- CELEBRITY-OWNED BRANDS (NO HARD LEVEL) ---------------------
+  {company:"Being Human", owner:"Salman Khan", level:"Easy", logo:"https://logo.clearbit.com/beinghumanclothing.com", category:"Celebrity"},
+  {company:"Ed-a-Mamma", owner:"Alia Bhatt", level:"Easy", logo:"", category:"Celebrity"},
+  {company:"82°E", owner:"Deepika Padukone", level:"Medium", logo:"https://logo.clearbit.com/82e.com", category:"Celebrity"},
+  {company:"HRX", owner:"Hrithik Roshan", level:"Medium", logo:"https://logo.clearbit.com/hrxbrand.com", category:"Celebrity"},
+  {company:"Kay Beauty", owner:"Katrina Kaif", level:"Medium", logo:"https://logo.clearbit.com/nykaa.com", category:"Celebrity"},
+  {company:"Wrogn", owner:"Virat Kohli", level:"Medium", logo:"https://logo.clearbit.com/wrogn.com", category:"Celebrity"},
+  // --------------------- IPL FRANCHISE OWNERS (ONLY HARD LEVEL) ---------------------
+  {company:"Mumbai Indians (MI)", owner:"Reliance Industries (Ambani)", level:"Hard", logo:"https://logo.clearbit.com/mumbaiindians.com", category:"IPL"},
+  {company:"Royal Challengers Bengaluru (RCB)", owner:"United Spirits (Diageo)", level:"Hard", logo:"https://logo.clearbit.com/royalchallengers.com", category:"IPL"},
+  {company:"Kolkata Knight Riders (KKR)", owner:"Shah Rukh Khan & Mehta Group", level:"Hard", logo:"https://logo.clearbit.com/kkr.in", category:"IPL"},
+  {company:"Chennai Super Kings (CSK)", owner:"India Cements (N. Srinivasan)", level:"Hard", logo:"https://logo.clearbit.com/chennaisuperkings.com", category:"IPL"},
+];
+
+let quizPool=[], qIndex=0, score=0, timerInterval=null, timeLeft=15;
+
+// DOM Elements
+const questionText = document.getElementById('questionText');
+const optionsWrap = document.getElementById('optionsWrap');
+const quizLogoImg = document.querySelector('#quizLogo img');
+const resultText = document.getElementById('resultText');
+const btnNext = document.getElementById('btnNext');
+const btnStart = document.getElementById('btnStart');
+const btnStop = document.getElementById('btnStop');
+const levelBadge = document.getElementById('levelBadge');
+const quizHero = document.querySelector('.quiz-hero');
+const timerDiv = document.getElementById('timer');
+const categorySelect = document.getElementById('categorySelect');
+const levelSelect = document.getElementById('levelSelect');
+const selectionContainer = document.getElementById('selectionContainer');
+
+// --- NEW: Functions to dynamically update dropdowns ---
+function updateLevelOptions() {
+    const selectedCategory = categorySelect.value;
+    levelSelect.value = 'default'; // Reset level selection
+
+    // If 'All' or default category is selected, enable all level options
+    if (selectedCategory === 'All' || selectedCategory === 'default') {
+        levelSelect.querySelectorAll('option').forEach(opt => opt.disabled = false);
+        return;
+    }
+
+    // Find which levels are available for the selected category
+    const availableLevels = new Set(
+        companies
+            .filter(c => c.category === selectedCategory)
+            .map(c => c.level)
+    );
+
+    // Enable or disable level options based on availability
+    levelSelect.querySelectorAll('option').forEach(opt => {
+        if (opt.value !== 'All' && opt.value !== 'default') {
+            opt.disabled = !availableLevels.has(opt.value);
+        } else {
+            opt.disabled = false; // Always keep 'All' and 'default' enabled
+        }
+    });
+}
+
+function updateCategoryOptions() {
+    const selectedLevel = levelSelect.value;
+    categorySelect.value = 'default'; // Reset category selection
+
+    if (selectedLevel === 'All' || selectedLevel === 'default') {
+        categorySelect.querySelectorAll('option').forEach(opt => opt.disabled = false);
+        return;
+    }
+    
+    const availableCategories = new Set(
+        companies
+            .filter(c => c.level === selectedLevel)
+            .map(c => c.category)
+    );
+
+    categorySelect.querySelectorAll('option').forEach(opt => {
+        if (opt.value !== 'All' && opt.value !== 'default') {
+            opt.disabled = !availableCategories.has(opt.value);
+        } else {
+            opt.disabled = false;
+        }
+    });
+}
+
+// --- Add event listeners to the dropdowns ---
+categorySelect.addEventListener('change', updateLevelOptions);
+levelSelect.addEventListener('change', updateCategoryOptions);
+
+
+function shuffleArray(arr){ return arr.sort(() => Math.random() - 0.5); }
+
+function startTimer(){
+  timeLeft=15;
+  timerDiv.textContent=`⏳ ${timeLeft}s`;
+  timerDiv.style.display='block';
+  timerInterval=setInterval(()=>{
+    timeLeft--;
+    timerDiv.textContent=`⏳ ${timeLeft}s`;
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      handleAnswer('timeout', quizPool[qIndex].owner);
+    }
+  },1000);
+}
+
+function loadQuestion(){
+  if(qIndex >= quizPool.length){ showFinalScore(); return; }
+  const q = quizPool[qIndex];
+  questionText.textContent=`Who is the founder / owner of ${q.company}?`;
+  levelBadge.textContent=`Category: ${q.category} | Level: ${q.level}`;
+  quizLogoImg.src = q.logo || 'placeholder.png';
+  quizLogoImg.alt = `${q.company} logo`;
+  optionsWrap.innerHTML='';
+  resultText.textContent='';
+
+  const poolOwners = companies.map(c => c.owner);
+  const opts = new Set([q.owner]);
+  while(opts.size < 4){
+    let randomOwner = poolOwners[Math.floor(Math.random() * poolOwners.length)];
+    if(randomOwner !== q.owner) opts.add(randomOwner);
+  }
+  
+  Array.from(opts).sort(() => Math.random() - 0.5).forEach(o => {
+    const div = document.createElement('div');
+    div.className='opt';
+    div.textContent=o;
+    div.onclick = () => handleAnswer(o, q.owner);
+    optionsWrap.appendChild(div);
+  });
+  btnNext.classList.add('hidden');
+  clearInterval(timerInterval);
+  startTimer();
+}
+
+function handleAnswer(selected, correct){
+  clearInterval(timerInterval);
+  if(selected === correct){
+    resultText.textContent = '✅ Correct!';
+    resultText.style.color = 'var(--correct)';
+    score++;
+  } else {
+    resultText.textContent = selected === 'timeout' ? `⌛ Time's up! Correct: ${correct}` : `❌ Wrong! Correct: ${correct}`;
+    resultText.style.color = 'var(--wrong)';
+  }
+  btnNext.classList.remove('hidden');
+  document.querySelectorAll('.opt').forEach(o => {
+      o.onclick=null;
+      if(o.textContent === correct) {
+          o.style.background = 'var(--correct)'; o.style.color = '#000';
+      } else if (o.textContent === selected) {
+          o.style.background = 'var(--wrong)'; o.style.color = '#000';
+      }
+  });
+}
+
+btnNext.addEventListener('click', () => { qIndex++; loadQuestion(); });
+btnStop.addEventListener('click', () => { clearInterval(timerInterval); showFinalScore(true); });
+
+function showFinalScore(stopped = false){
+  questionText.textContent = stopped ? "⏹ Quiz Stopped!" : "🎉 Quiz Completed!";
+  optionsWrap.innerHTML = '';
+  levelBadge.textContent = `Selection: ${categorySelect.value} | ${levelSelect.value}`;
+  timerDiv.style.display = 'none';
+  resultText.innerHTML = `Your Score: ${score} / ${qIndex}`;
+
+  const leaderboard = JSON.parse(localStorage.getItem('companyQuizLeaderboard') || '[]');
+  const entry = {
+      score: score, total: qIndex, category: categorySelect.value, level: levelSelect.value, 
+      date: new Date().toISOString(), stopped: stopped
+  };
+  leaderboard.unshift(entry);
+  localStorage.setItem('companyQuizLeaderboard', JSON.stringify(leaderboard.slice(0,10)));
+
+  const lbDiv = document.createElement('div');
+  lbDiv.style.marginTop='12px';
+  lbDiv.innerHTML='<h4>🏆 Recent Scores</h4>';
+  const ol = document.createElement('ol');
+  leaderboard.slice(0,5).forEach(item => {
+    const li = document.createElement('li');
+    let text = `${item.score}/${item.total} [${item.category} | ${item.level}] — ${item.date}`;
+    if (item.stopped) text += ' ⚠️';
+    li.textContent = text;
+    ol.appendChild(li);
+  });
+  lbDiv.appendChild(ol);
+  optionsWrap.appendChild(lbDiv);
+
+  btnNext.textContent = 'Restart Quiz';
+  btnNext.onclick = () => location.reload();
+  btnStop.classList.add('hidden');
+  btnNext.classList.remove('hidden');
+}
+
+btnStart.addEventListener('click', () => {
+  const selectedCategory = categorySelect.value;
+  const selectedLevel = levelSelect.value;
+
+  if (selectedCategory === 'default' || selectedLevel === 'default') {
+    alert("Please select both a category and a level!");
+    return;
+  }
+
+  let filteredCompanies = companies;
+  if (selectedCategory !== 'All') {
+    filteredCompanies = filteredCompanies.filter(c => c.category === selectedCategory);
+  }
+  if (selectedLevel !== 'All') {
+    filteredCompanies = filteredCompanies.filter(c => c.level === selectedLevel);
+  }
+  
+  if (filteredCompanies.length === 0) {
+      alert("No questions found for this combination. Please try another selection.");
+      return;
+  }
+  
+  quizPool = shuffleArray(filteredCompanies);
+  
+  quizHero.style.display = 'flex';
+  selectionContainer.style.display = 'none';
+  btnStart.classList.add('hidden');
+  btnStop.classList.remove('hidden');
+  loadQuestion();
+});
+
+// Animated background circles
+for(let i=0; i<8; i++){
+  const circle = document.createElement('div');
+  circle.className='bg-circle';
+  const size = Math.random() * 200 + 50;
+  circle.style.width = circle.style.height = size + 'px';
+  circle.style.left = Math.random() * 100 + '%';
+  circle.style.top = Math.random() * 100 + '%';
+  circle.style.background = ['#ffd166','#7af0c9','#60a5fa','#a78bfa','#ffb86b'][Math.floor(Math.random()*5)];
+  circle.style.animationDuration = (12 + Math.random() * 10) + 's';
+  document.body.appendChild(circle);
+}
+</script>
+
+</body>
+</html>

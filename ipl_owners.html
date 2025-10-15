@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Companies — IPL Franchise Owners</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#0f172a; --bg2:#081028; --card:#071730;
+  --accent:#7af0c9; --accent2:#ffd166; --muted:#9fd8ff66;
+  --radius:14px;
+}
+body{
+  margin:0;
+  font-family:'Inter', sans-serif;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:#e6eef8;
+  padding:16px;
+}
+.wrap{
+  max-width:1100px;
+  margin:auto;
+}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));
+  padding:18px;
+  border-radius:var(--radius);
+  box-shadow:0 10px 40px rgba(2,6,23,0.6);
+}
+.controls-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:12px;
+}
+.search{
+  padding:8px;
+  border-radius:10px;
+  background:#021428;
+  border:1px solid rgba(255,255,255,0.03);
+  color:inherit;
+  min-width:160px;
+  flex:1;
+}
+.level-btn{
+  padding:6px 12px;
+  border-radius:10px;
+  background:#021428;
+  border:1px solid rgba(255,255,255,0.03);
+  color:inherit;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.2s;
+}
+.level-btn:hover, .level-btn.active{
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#012;
+  transform:scale(1.05);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+  margin-top:12px;
+}
+th,td{
+  padding:10px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+}
+th{color:#ffeaa7;font-weight:700;font-size:13px;}
+.mini-logo{width:44px;height:44px;border-radius:8px;background:#fff;display:inline-block;vertical-align:middle;margin-right:8px;overflow:hidden;}
+.mini-logo img{width:100%;height:100%;object-fit:contain;display:block;}
+.pagination{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;}
+.page-btn{padding:7px 9px;border-radius:8px;background:transparent;border:1px solid white;cursor:pointer;color:#ffeaa7}
+.page-btn:hover{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#012;transform:scale(1.05);}
+#tableInfo{font-size:13px;color:#9fd8ff66;margin-top:4px;}
+.back-btn{
+  margin-bottom:12px;
+  padding:10px 16px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#012;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.2s;
+}
+.back-btn:hover{transform:scale(1.05); box-shadow:0 6px 18px rgba(0,0,0,0.4);}
+@media(max-width:600px){
+  .mini-logo{width:36px;height:36px;}
+  th,td{padding:6px 8px;font-size:12px;}
+  .search{min-width:120px;}
+}
+.bg-circle {
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: float 15s infinite linear;
+  z-index: 1;
+}
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-50px) rotate(180deg); }
+  100% { transform: translateY(0px) rotate(360deg); }
+}
+body {
+  position: relative;
+}
+.wrap {
+  position: relative;
+  z-index: 2;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <button class="back-btn" onclick="location.href='index.html'">⬅ Back to Dashboard</button>
+  <div class="card">
+    <h2>🏆 Learn — IPL Franchise Ownership</h2>
+    <div class="controls-row">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="level-btn active" data-level="All">All</button>
+        <button class="level-btn" data-level="Corporate">Corporate</button>
+        <button class="level-btn" data-level="Celebrity">Celebrity/JV</button>
+        <button class="level-btn" data-level="Finance">Finance/PE</button>
+      </div>
+      <input id="searchInput" class="search" placeholder="Search team, city, or owner..." />
+      <div class="pagination" id="pagination">
+    </div>
+    </div>
+    <table id="learnTable">
+      <thead>
+        <tr><th>#</th><th>Team (City)</th><th>Major Owner(s) / Parent Company</th><th>Ownership Type & Business Fact</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+<div id="tableInfo"></div>
+</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+      
+  </div>
+</div>
+
+<script>
+/********* Utility for fallback logo *********/
+function initialsSVG(name,w=80,h=80){
+  const initials = (name||'').split(/\s+/).slice(0,2).map(n=>n[0]||'').join('').toUpperCase() || '?';
+  const colors = ['#ffd166','#7af0c9','#60a5fa','#a78bfa','#ffb86b'];
+  const bg = colors[Math.abs(hashCode(name||'')) % colors.length];
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>
+    <rect width='100%' height='100%' rx='12' fill='${bg}'/>
+    <text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='Inter,Arial' font-size='24' fill='#012'>${initials}</text>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+function hashCode(s){ return s.split('').reduce((a,b)=>((a<<5)-a)+b.charCodeAt(0),0)|0; }
+
+/********* IPL Owners Data *********/
+const companies = [
+  {company:"Mumbai Indians (MI)", owner:"Reliance Industries (Nita & Mukesh Ambani)", fact:"Single corporate ownership via IndiaWin Sports. RIL is a massive conglomerate in telecom, energy, and retail.", level:"Corporate", logo:"https://logo.clearbit.com/relianceindustries.com"},
+  {company:"Chennai Super Kings (CSK)", owner:"Chennai Super Kings Cricket Limited (India Cements / N. Srinivasan)", fact:"Corporate entity formerly owned by India Cements, a major cement manufacturer.", level:"Corporate", logo:"https://logo.clearbit.com/indiacements.co.in"},
+  {company:"Royal Challengers Bengaluru (RCB)", owner:"United Spirits Limited (Diageo subsidiary)", fact:"Owned by a major global alcoholic beverage company. Team named after the 'Royal Challenge' liquor brand.", level:"Corporate", logo:"https://logo.clearbit.com/diageo.com"},
+  {company:"Kolkata Knight Riders (KKR)", owner:"Red Chillies Entertainment (Shah Rukh Khan) & Mehta Group (Juhi Chawla & Jay Mehta)", fact:"Joint venture involving Bollywood stars and a global business conglomerate.", level:"Celebrity", logo:"https://logo.clearbit.com/redchillies.com"},
+  {company:"Gujarat Titans (GT)", owner:"Torrent Group (67%) & CVC Capital Partners (33%)", fact:"Majority stake owned by Ahmedabad-based conglomerate (Pharma/Power). CVC is a global Private Equity firm.", level:"Finance", logo:"https://logo.clearbit.com/torrent.com"},
+  {company:"Lucknow Super Giants (LSG)", owner:"RP-Sanjiv Goenka Group (Sanjiv Goenka)", fact:"Owned by a diversified Indian conglomerate with interests in power, carbon black, retail, and media.", level:"Corporate", logo:""},
+  {company:"Delhi Capitals (DC)", owner:"GMR Group (50%) & JSW Group (50%)", fact:"Joint venture between two major Indian corporate groups: Infrastructure (GMR) and Steel/Energy/Sports (JSW).", level:"Corporate", logo:"https://logo.clearbit.com/jsw.in"},
+  {company:"Sunrisers Hyderabad (SRH)", owner:"Sun TV Network (Kalanithi Maran)", fact:"Owned by one of India's largest media conglomerates, focusing on regional broadcasting.", level:"Corporate", logo:"https://logo.clearbit.com/suntv.in"},
+  {company:"Punjab Kings (PBKS)", owner:"Mohit Burman, Ness Wadia, Preity Zinta, Karan Paul", fact:"Owned by a consortium of celebrities and business individuals from the Wadia Group and Dabur (Burman family).", level:"Celebrity", logo:""},
+  {company:"Rajasthan Royals (RR)", owner:"Manoj Badale (Majority Stakeholder) & RedBird Capital Partners", fact:"UK-based Emerging Media holds the majority stake. RedBird is a US-based Private Equity firm.", level:"Finance", logo:""},
+];
+
+// Reusing the script logic from the original learn.html
+const rowsPerPage = 10;
+let currentPage = 1, filtered = companies.slice();
+const tableBody = document.querySelector('#learnTable tbody');
+const pagination = document.getElementById('pagination');
+const tableInfo = document.getElementById('tableInfo');
+const searchInput = document.getElementById('searchInput');
+let currentLevel = "All";
+
+// Render table
+function renderTable(){
+  const start = (currentPage-1)*rowsPerPage;
+  const pageItems = filtered.slice(start, start+rowsPerPage);
+  tableBody.innerHTML = '';
+  pageItems.forEach((c, idx)=>{
+    const seq = start+idx+1;
+    const logoSrc = c.logo || initialsSVG(c.owner); 
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${seq}</td>
+      <td><strong>${c.company}</strong></td>
+      <td><span class="mini-logo"><img src="${logoSrc}" alt="" onerror="this.onerror=null; this.src='${initialsSVG(c.owner)}'"></span>${c.owner||'—'}</td>
+      <td>${c.fact||'—'}</td>`;
+    tableBody.appendChild(tr);
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length/rowsPerPage));
+  pagination.innerHTML = '';
+  pagination.appendChild(makePageBtn('Prev',()=>{if(currentPage>1){currentPage--; renderTable();}}));
+
+  const windowSize = 5;
+  let startPage = Math.max(1,currentPage-Math.floor(windowSize/2));
+  let endPage = Math.min(totalPages,startPage+windowSize-1);
+  if(endPage-startPage<windowSize-1) startPage = Math.max(1,endPage-windowSize+1);
+
+  for(let p=startPage;p<=endPage;p++){
+    const btn = makePageBtn(p,()=>{currentPage=p;renderTable();});
+    if(p===currentPage) btn.style.fontWeight='800';
+    pagination.appendChild(btn);
+  }
+
+  pagination.appendChild(makePageBtn('Next',()=>{if(currentPage<totalPages){currentPage++;renderTable();}}));
+
+  tableInfo.textContent = `Showing ${Math.min(filtered.length,start+1)}-${Math.min(filtered.length,start+rowsPerPage)} of ${filtered.length} IPL Teams`;
+}
+function makePageBtn(label,onClick){ const b=document.createElement('button'); b.className='page-btn'; b.textContent=label; b.onclick=onClick; return b; }
+
+// Search & Filter
+searchInput.addEventListener('input', filterAndRender);
+document.querySelectorAll('.level-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentLevel = btn.dataset.level;
+    filterAndRender();
+  });
+});
+
+function filterAndRender(){
+  const q = searchInput.value.trim().toLowerCase();
+  filtered = companies.filter(c=>{
+    const matchesLevel = (currentLevel==="All") || (c.level===currentLevel);
+    const matchesSearch = (c.company||'').toLowerCase().includes(q) ||
+                          (c.owner||'').toLowerCase().includes(q) ||
+                          (c.fact||'').toLowerCase().includes(q) ||
+                          (c.level||'').toLowerCase().includes(q);
+    return matchesLevel && matchesSearch;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+// Animated background circles (copied from original)
+for(let i=0;i<10;i++){
+  const circle=document.createElement('div');
+  circle.className='bg-circle';
+  const size=Math.random()*200+50;
+  circle.style.width=circle.style.height=size+'px';
+  circle.style.left=Math.random()*100+'%';
+  circle.style.top=Math.random()*100+'%';
+  circle.style.background=['#ffd166','#7af0c9','#60a5fa','#a78bfa','#ffb86b'][Math.floor(Math.random()*5)];
+  circle.style.animationDuration=(10+Math.random()*10)+'s';
+  document.body.appendChild(circle);
+}
+
+
+renderTable();
+</script>
+</body>
+</html>

@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Companies — CMAT Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#0f172a; --bg2:#081028; --card:#071730;
+  --accent:#7af0c9; --accent2:#ffd166; --muted:#9fd8ff66;
+  --radius:14px;
+}
+body{
+  margin:0;
+  font-family:'Inter', sans-serif;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:#e6eef8;
+  padding:16px;
+}
+.wrap{
+  max-width:1100px;
+  margin:auto;
+}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));
+  padding:18px;
+  border-radius:var(--radius);
+  box-shadow:0 10px 40px rgba(2,6,23,0.6);
+}
+.controls-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:12px;
+}
+.search{
+  padding:8px;
+  border-radius:10px;
+  background:#021428;
+  border:1px solid rgba(255,255,255,0.03);
+  color:inherit;
+  min-width:160px;
+  flex:1;
+}
+.level-btn{
+  padding:6px 12px;
+  border-radius:10px;
+  background:#021428;
+  border:1px solid rgba(255,255,255,0.03);
+  color:inherit;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.2s;
+}
+.level-btn:hover, .level-btn.active{
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#012;
+  transform:scale(1.05);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+  margin-top:12px;
+}
+th,td{
+  padding:10px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+}
+th{color:#ffeaa7;font-weight:700;font-size:13px;}
+.mini-logo{width:44px;height:44px;border-radius:8px;background:#fff;display:inline-block;vertical-align:middle;margin-right:8px;overflow:hidden;}
+.mini-logo img{width:100%;height:100%;object-fit:contain;display:block;}
+.pagination{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;}
+.page-btn{padding:7px 9px;border-radius:8px;background:transparent;border:1px solid white;cursor:pointer;color:#ffeaa7}
+.page-btn:hover{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#012;transform:scale(1.05);}
+#tableInfo{font-size:13px;color:#9fd8ff66;margin-top:4px;}
+.back-btn{
+  margin-bottom:12px;
+  padding:10px 16px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#012;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.2s;
+}
+.back-btn:hover{transform:scale(1.05); box-shadow:0 6px 18px rgba(0,0,0,0.4);}
+@media(max-width:600px){
+  .mini-logo{width:36px;height:36px;}
+  th,td{padding:6px 8px;font-size:12px;}
+  .search{min-width:120px;}
+}
+.bg-circle {
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: float 15s infinite linear;
+  z-index: 1;
+}
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-50px) rotate(180deg); }
+  100% { transform: translateY(0px) rotate(360deg); }
+}
+body {
+  position: relative; /* required for circles */
+ // overflow: hidden;   /* prevent scrollbars from circles */
+}
+.wrap {
+  position: relative; 
+  z-index: 2; /* content above circles */
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <button class="back-btn" onclick="location.href='index.html'">⬅ Back to Dashboard</button>
+    <button class="back-btn" onclick="location.href='quiz.html'">📝 Take Quiz</button>
+  <div class="card">
+    <h2>📋 Learn — Companies</h2>
+    <div class="controls-row">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="level-btn active" data-level="All">All</button>
+        <button class="level-btn" data-level="Easy">Easy</button>
+        <button class="level-btn" data-level="Medium">Medium</button>
+        <button class="level-btn" data-level="Hard">Hard</button>
+      </div>
+      <input id="searchInput" class="search" placeholder="Search company or owner..." />
+      <div class="pagination" id="pagination">
+    </div>
+    </div>
+    <table id="learnTable">
+      <thead>
+        <tr><th>#</th><th>Company</th><th>Owner / Founder</th><th>Fact</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+<div id="tableInfo"></div>
+</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+      
+  </div>
+</div>
+
+<script>
+/********* Utility for fallback logo *********/
+function initialsSVG(name,w=80,h=80){
+  const initials = (name||'').split(/\s+/).slice(0,2).map(n=>n[0]||'').join('').toUpperCase() || '?';
+  const colors = ['#ffd166','#7af0c9','#60a5fa','#a78bfa','#ffb86b'];
+  const bg = colors[Math.abs(hashCode(name||'')) % colors.length];
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>
+    <rect width='100%' height='100%' rx='12' fill='${bg}'/>
+    <text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='Inter,Arial' font-size='24' fill='#012'>${initials}</text>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+function hashCode(s){ return s.split('').reduce((a,b)=>((a<<5)-a)+b.charCodeAt(0),0)|0; }
+
+/********* Companies Data *********/
+const companies = [ 
+  // --------------------- EXISTING DATA ---------------------
+  {company:"Zomato", owner:"Deepinder Goyal", fact:"Food delivery/dining platform. Founded 2008.", level:"Easy", logo:"https://logo.clearbit.com/zomato.com"},
+  {company:"Swiggy", owner:"Sriharsha Majety", fact:"Food delivery and quick commerce (Instamart). Founded 2014.", level:"Easy", logo:"https://logo.clearbit.com/swiggy.com"},
+  {company:"Byju's", owner:"Byju Raveendran", fact:"Leading Indian EdTech company.", level:"Easy", logo:"https://logo.clearbit.com/byjus.com"},
+  {company:"Nykaa", owner:"Falguni Nayar", fact:"Beauty, wellness, and fashion e-commerce.", level:"Easy", logo:"https://logo.clearbit.com/nykaa.com"},
+  {company:"Paytm", owner:"Vijay Shekhar Sharma", fact:"Digital payments and financial services (One97).", level:"Easy", logo:"https://logo.clearbit.com/paytm.com"},
+  {company:"OYO", owner:"Ritesh Agarwal", fact:"Global hospitality chain and budget hotel aggregator.", level:"Easy", logo:"https://logo.clearbit.com/oyorooms.com"},
+  {company:"Lenskart", owner:"Peyush Bansal", fact:"Eyewear and optical products e-commerce.", level:"Easy", logo:"https://logo.clearbit.com/lenskart.com"},
+  {company:"Groww", owner:"Lalit Keshre", fact:"Investment and mutual funds platform.", level:"Easy", logo:"https://logo.clearbit.com/groww.in"},
+  {company:"Zerodha", owner:"Nithin Kamath", fact:"Financial services and discount brokerage.", level:"Easy", logo:"https://logo.clearbit.com/zerodha.com"},
+  {company:"Dream11", owner:"Harsh Jain", fact:"Fantasy sports platform (Dream Sports parent).", level:"Easy", logo:"https://logo.clearbit.com/dream11.com"},
+  {company:"Flipkart", owner:"Sachin & Binny Bansal", fact:"E-commerce giant (Walmart-owned since 2018).", level:"Medium", logo:"https://logo.clearbit.com/flipkart.com"},
+  {company:"Ola", owner:"Bhavish Aggarwal", fact:"Ride-sharing, mobility, and EV manufacturing.", level:"Medium", logo:"https://logo.clearbit.com/olacabs.com"},
+  {company:"MakeMyTrip", owner:"Deep Kalra", fact:"Online travel and ticketing portal.", level:"Medium", logo:"https://logo.clearbit.com/makemytrip.com"},
+  {company:"PolicyBazaar", owner:"Yashish Dahiya", fact:"Insurance and loan aggregation platform.", level:"Medium", logo:"https://logo.clearbit.com/policybazaar.com"},
+  {company:"PhonePe", owner:"Sameer Nigam", fact:"Digital payments app (Walmart-owned).", level:"Medium", logo:"https://logo.clearbit.com/phonepe.com"},
+  {company:"PhysicsWallah", owner:"Alakh Pandey", fact:"Affordable EdTech platform for competitive exams.", level:"Medium", logo:"https://logo.clearbit.com/physicswallah.com"},
+  {company:"boAt", owner:"Aman Gupta", fact:"Indian audio and wearable electronics brand.", level:"Medium", logo:"https://logo.clearbit.com/boAt.com"},
+  {company:"BharatPe", owner:"Ashneer Grover (co-founder)", fact:"Fintech platform for merchant payments.", level:"Medium", logo:"https://logo.clearbit.com/bharatpe.com"},
+  {company:"Shaadi.com", owner:"Anupam Mittal", fact:"Online matrimonial service.", level:"Medium", logo:"https://logo.clearbit.com/shaadi.com"},
+  {company:"Tata Group", owner:"Jamsetji Tata (founder)", fact:"Salt-to-software conglomerate. Founded 1868.", level:"Hard", logo:"https://logo.clearbit.com/tata.com"},
+  {company:"Tesla", owner:"Elon Musk", fact:"Electric vehicle and clean energy company.", level:"Hard", logo:"https://logo.clearbit.com/tesla.com"},
+  {company:"Amazon", owner:"Jeff Bezos", fact:"Global e-commerce and cloud computing leader.", level:"Hard", logo:"https://logo.clearbit.com/amazon.com"},
+  {company:"Microsoft", owner:"Bill Gates (co-founder)", fact:"Software and technology giant.", level:"Hard", logo:"https://logo.clearbit.com/microsoft.com"},
+  {company:"Apple", owner:"Steve Jobs (co-founder)", fact:"Consumer electronics (iPhone, Mac, iPad).", level:"Hard", logo:"https://logo.clearbit.com/apple.com"},
+  {company:"Meta (Facebook)", owner:"Mark Zuckerberg", fact:"Social media and metaverse technology group.", level:"Hard", logo:"https://logo.clearbit.com/meta.com"},
+  {company:"Google", owner:"Larry Page & Sergey Brin", fact:"Internet search, cloud computing, and AI (Alphabet parent).", level:"Hard", logo:"https://logo.clearbit.com/google.com"},
+  {company:"Infosys", owner:"N. R. Narayana Murthy", fact:"Indian multinational IT consulting company.", level:"Hard", logo:"https://logo.clearbit.com/infosys.com"},
+  {company:"Wipro", owner:"Azim Premji (chair)", fact:"Indian multinational IT, consulting, and BPO company.", level:"Hard", logo:"https://logo.clearbit.com/wipro.com"},
+  {company:"Reliance Industries", owner:"Dhirubhai Ambani (founder)", fact:"Oil, gas, telecom (Jio), and retail conglomerate.", level:"Hard", logo:"https://logo.clearbit.com/relianceindustries.com"},
+  {company:"Adani Group", owner:"Gautam Adani", fact:"Ports, energy, and infrastructure conglomerate.", level:"Hard", logo:"https://logo.clearbit.com/adani.com"},
+  {company:"CRED", owner:"Kunal Shah", fact:"Credit-card payment rewards platform.", level:"Medium", logo:"https://logo.clearbit.com/cred.club"},
+  {company:"Razorpay", owner:"Harshil Mathur & Shashank Kumar", fact:"Payment gateway and financial solutions platform.", level:"Medium", logo:"https://logo.clearbit.com/razorpay.com"},
+  {company:"Freshworks", owner:"Girish Mathrubootham", fact:"Indian-origin SaaS (Software as a Service) company.", level:"Medium", logo:"https://logo.clearbit.com/freshworks.com"},
+  {company:"Delhivery", owner:"Nisheet Agrawal et al.", fact:"Logistics and supply chain services company.", level:"Medium", logo:"https://logo.clearbit.com/delhivery.com"},
+  {company:"BigBasket", owner:"Hari Menon & Co.", fact:"Online grocery store (Tata Digital acquired).", level:"Easy", logo:"https://logo.clearbit.com/bigbasket.com"},
+  {company:"Myntra", owner:"Mukesh Bansal (founder)", fact:"Fashion e-commerce (Walmart-owned).", level:"Medium", logo:"https://logo.clearbit.com/myntra.com"},
+  {company:"Info Edge (Naukri)", owner:"Sanjeev Bikhchandani", fact:"Parent company of Naukri.com, Jeevansathi, etc.", level:"Hard", logo:"https://logo.clearbit.com/infoedge.in"},
+  {company:"Naukri.com", owner:"Info Edge", fact:"Leading Indian job portal.", level:"Medium", logo:"https://logo.clearbit.com/naukri.com"},
+  {company:"Quikr", owner:"Pranay Chulet", fact:"Classifieds and transactional platform.", level:"Medium", logo:"https://logo.clearbit.com/quikr.com"},
+  {company:"PharmEasy", owner:"Dharmil Sheth", fact:"Online pharmacy and healthcare services.", level:"Medium", logo:"https://logo.clearbit.com/pharmeasy.in"},
+  {company:"Blinkit (formerly Grofers)", owner:"Zomato (acquired)", fact:"Quick commerce/10-minute grocery delivery.", level:"Medium", logo:"https://logo.clearbit.com/blinkit.com"},
+  {company:"FirstCry", owner:"Supam Maheshwari", fact:"E-commerce for baby and kids products.", level:"Medium", logo:"https://logo.clearbit.com/firstcry.com"},
+  {company:"Pepperfry", owner:"Ashish Shah", fact:"Online furniture and home goods store.", level:"Medium", logo:"https://logo.clearbit.com/pepperfry.com"},
+  {company:"Dunzo", owner:"Kabeer Biswas & Co.", fact:"Hyperlocal quick delivery service.", level:"Medium", logo:"https://logo.clearbit.com/dunzo.in"},
+  {company:"Licious", owner:"Abhay Hanjura", fact:"Fresh meat and seafood delivery brand.", level:"Medium", logo:"https://logo.clearbit.com/licious.in"},
+  {company:"RedBus", owner:"Phanindra Sama", fact:"Online bus ticket booking platform.", level:"Easy", logo:"https://logo.clearbit.com/redbus.in"},
+  {company:"Cleartrip", owner:"Travel portal", fact:"Travel booking platform (Flipkart acquired).", level:"Medium", logo:"https://logo.clearbit.com/cleartrip.com"},
+  {company:"BrowserStack", owner:"Ritesh Arora & Co.", fact:"Global testing platform for web browsers.", level:"Medium", logo:"https://logo.clearbit.com/browserstack.com"},
+  {company:"InMobi", owner:"Naveen Tewari", fact:"Mobile advertising and marketing platform.", level:"Medium", logo:"https://logo.clearbit.com/inmobi.com"},
+  {company:"Vedantu", owner:"Vamsi Krishna", fact:"EdTech platform for live online classes.", level:"Medium", logo:"https://logo.clearbit.com/vedantu.com"},
+  {company:"UpGrad", owner:"Mayank Kumar", fact:"Higher education and upskilling platform.", level:"Medium", logo:"https://logo.clearbit.com/upgrad.com"},
+  {company:"Hike", owner:"Kavin Bharti Mittal", fact:"Messaging app turned gaming/social platform.", level:"Medium", logo:"https://logo.clearbit.com/hike.in"},
+  {company:"Rivian", owner:"RJ Scaringe", fact:"US-based Electric Vehicle (EV) manufacturer.", level:"Hard", logo:"https://logo.clearbit.com/rivian.com"},
+  {company:"SpaceX", owner:"Elon Musk", fact:"Aerospace manufacturer and space transportation services.", level:"Hard", logo:"https://logo.clearbit.com/spacex.com"},
+  {company:"OpenAI", owner:"Sam Altman & team", fact:"AI research and deployment company (ChatGPT, DALL-E).", level:"Hard", logo:"https://logo.clearbit.com/openai.com"},
+  {company:"Netflix", owner:"Reed Hastings (co-founder)", fact:"Global streaming and entertainment giant.", level:"Hard", logo:"https://logo.clearbit.com/netflix.com"},
+  {company:"Samsung", owner:"Samsung Group", fact:"South Korean electronics conglomerate.", level:"Hard", logo:"https://logo.clearbit.com/samsung.com"},
+  {company:"Intel", owner:"Multinational", fact:"Semiconductor chip manufacturer.", level:"Hard", logo:"https://logo.clearbit.com/intel.com"},
+  {company:"IBM", owner:"Historic tech firm", fact:"Global technology consulting and services company.", level:"Hard", logo:"https://logo.clearbit.com/ibm.com"},
+  {company:"TCS", owner:"Tata Group", fact:"India's largest IT services company.", level:"Hard", logo:"https://logo.clearbit.com/tcs.com"},
+  {company:"HDFC Bank", owner:"Promoter group", fact:"India's largest private sector bank.", level:"Hard", logo:"https://logo.clearbit.com/hdfcbank.com"},
+  {company:"ICICI Bank", owner:"ICICI group", fact:"Major Indian private sector bank.", level:"Hard", logo:"https://logo.clearbit.com/icicibank.com"},
+  {company:"Axis Bank", owner:"Former promoter group", fact:"Indian private sector bank.", level:"Hard", logo:"https://logo.clearbit.com/axisbank.com"},
+  {company:"Bajaj Finserv", owner:"Bajaj family", fact:"Financial services, insurance, and investment.", level:"Hard", logo:"https://logo.clearbit.com/bajajfinserv.in"},
+  {company:"Mahindra & Mahindra", owner:"Mahindra family", fact:"Automotive, farm equipment, and IT (Tech Mahindra).", level:"Hard", logo:"https://logo.clearbit.com/mahindra.com"},
+  {company:"Godrej", owner:"Godrej family", fact:"Conglomerate in real estate, consumer products, and agriculture.", level:"Hard", logo:"https://logo.clearbit.com/godrej.com"},
+  {company:"Asian Paints", owner:"Founding families", fact:"India's largest paint company.", level:"Hard", logo:"https://logo.clearbit.com/asianpaints.com"},
+  {company:"SBI", owner:"Government of India", fact:"India's largest public sector bank.", level:"Hard", logo:"https://logo.clearbit.com/sbi.co.in"},
+  {company:"BSE", owner:"Bombay Stock Exchange", fact:"Asia's oldest stock exchange.", level:"Hard", logo:"https://logo.clearbit.com/bseindia.com"},
+  {company:"ShopClues", owner:"Sandeep Aggarwal", fact:"Online marketplace.", level:"Medium", logo:"https://logo.clearbit.com/shopclues.com"},
+  {company:"GoDaddy", owner:"GoDaddy Inc.", fact:"Domain name registrar and web hosting.", level:"Medium", logo:"https://logo.clearbit.com/godaddy.com"},
+  {company:"Tinder", owner:"Match Group", fact:"Location-based dating and social networking app.", level:"Hard", logo:"https://logo.clearbit.com/tinder.com"},
+  {company:"LinkedIn", owner:"Reid Hoffman (founder)", fact:"Professional networking service (Microsoft-owned).", level:"Hard", logo:"https://logo.clearbit.com/linkedin.com"},
+  {company:"Twitter (X)", owner:"Elon Musk", fact:"Micro-blogging and social network service.", level:"Hard", logo:"https://logo.clearbit.com/x.com"},
+  {company:"PayU", owner:"Naspers/Prosus", fact:"Payments and financial services.", level:"Medium", logo:"https://logo.clearbit.com/payu.com"},
+  {company:"NVIDIA", owner:"Jensen Huang", fact:"Graphics processing unit (GPU) leader.", level:"Hard", logo:"https://logo.clearbit.com/nvidia.com"},
+  {company:"Oracle", owner:"Larry Ellison (co-founder)", fact:"Database software and cloud technology.", level:"Hard", logo:"https://logo.clearbit.com/oracle.com"},
+  {company:"SAP", owner:"Enterprise software", fact:"German multinational enterprise software company.", level:"Hard", logo:"https://logo.clearbit.com/sap.com"},
+  {company:"Adobe", owner:"Software giant", fact:"Creative software (Photoshop, Acrobat, Illustrator).", level:"Hard", logo:"https://logo.clearbit.com/adobe.com"},
+  {company:"Meesho", owner:"Vidit Aatrey & Co.", fact:"Social commerce platform for resellers.", level:"Medium", logo:"https://logo.clearbit.com/meesho.com"},
+  {company:"MobiKwik", owner:"Bipin Preet Singh", fact:"Digital payments and mobile wallet.", level:"Medium", logo:"https://logo.clearbit.com/mobikwik.com"},
+  {company:"Urban Company", owner:"Rahul Shetty", fact:"Home services marketplace (formerly UrbanClap).", level:"Medium", logo:"https://logo.clearbit.com/urbancompany.com"},
+  {company:"NoBroker", owner:"Amit Agarwal", fact:"Zero-brokerage property marketplace.", level:"Medium", logo:"https://logo.clearbit.com/nobroker.in"},
+  {company:"CarDekho", owner:"Aparajita Jain", fact:"Automobile research and comparison portal.", level:"Medium", logo:"https://logo.clearbit.com/cardekho.com"},
+  {company:"CureFit (Cult.fit)", owner:"Mukesh Bansal", fact:"Health, fitness, and wellness platform.", level:"Medium", logo:"https://logo.clearbit.com/cure.fit"},
+  {company:"Zepto", owner:"Girish & Rahul", fact:"Quick commerce grocery delivery startup.", level:"Medium", logo:"https://logo.clearbit.com/zepto.co"},
+  {company:"Ather Energy", owner:"Tarun Mehta & Swapnil", fact:"Indian electric scooter manufacturer.", level:"Medium", logo:"https://logo.clearbit.com/atherenergy.com"},
+  {company:"Dream Sports", owner:"Harsh Jain", fact:"Parent company of Dream11 and other sports tech ventures.", level:"Medium", logo:"https://logo.clearbit.com/dream11.com"}, 
+  {company:"Urban Ladder", owner:"Ashish Goel & Rajiv Srivatsa", fact:"Online furniture and decor retailer.", level:"Medium", logo:"https://logo.clearbit.com/urbanladder.com"},
+  {company:"BookMyShow", owner:"Ashish Hemrajani", fact:"Online ticketing for movies and events.", level:"Medium", logo:"https://logo.clearbit.com/bookmyshow.com"},
+  {company:"Zoomcar", owner:"Greg Moran", fact:"Self-drive car rental service.", level:"Medium", logo:"https://logo.clearbit.com/zoomcar.com"},
+  {company:"Rebel Foods", owner:"Faisal Farooqui", fact:"Internet restaurant / cloud kitchen operator (Faasos).", level:"Medium", logo:"https://logo.clearbit.com/rebelfoods.com"},
+  {company:"Pine Labs", owner:"Amrish Rau (CEO)", fact:"Merchant payments and financial solutions.", level:"Medium", logo:"https://logo.clearbit.com/pinelabs.com"},
+  {company:"Rapido", owner:"Aravind Sanka", fact:"Bike taxi and auto rickshaw service aggregator.", level:"Medium", logo:"https://logo.clearbit.com/rapido.bike"},
+  {company:"Tata Motors", owner:"Tata Group", fact:"Automotive manufacturer (includes Jaguar Land Rover).", level:"Hard", logo:"https://logo.clearbit.com/tatamotors.com"},
+  {company:"PayPal", owner:"Peter Thiel & Co.", fact:"Global digital payments platform.", level:"Hard", logo:"https://logo.clearbit.com/paypal.com"},
+  {company:"Spotify", owner:"Daniel Ek & Martin Lorentzon", fact:"Music, podcast, and video streaming service.", level:"Hard", logo:"https://logo.clearbit.com/spotify.com"},
+  {company:"Airbnb", owner:"Brian Chesky, Joe Gebbia & Nathan Blecharczyk", fact:"Online marketplace for lodging and tourism.", level:"Hard", logo:"https://logo.clearbit.com/airbnb.com"},
+  {company:"Snapdeal", owner:"Kunal Bahl & Rohit Bansal", fact:"Indian e-commerce marketplace.", level:"Medium", logo:"https://logo.clearbit.com/snapdeal.com"},
+  {company:"Paper Boat", owner:"Hector Beverages", fact:"Traditional Indian beverage brand.", level:"Medium", logo:"https://logo.clearbit.com/paperboat.com"},
+  {company:"IKEA India", owner:"Ingka Group", fact:"Swedish furniture and home goods retailer.", level:"Hard", logo:"https://logo.clearbit.com/ikea.com"},
+  {company:"Maruti Suzuki", owner:"Suzuki Motor Corporation", fact:"Largest passenger car manufacturer in India (JV).", level:"Hard", logo:"https://logo.clearbit.com/marutisuzuki.com"},
+  {company:"Canon India", owner:"Canon Inc.", fact:"Imaging, optical, and industrial products.", level:"Hard", logo:"https://logo.clearbit.com/canon.co.in"},
+  {company:"Siemens India", owner:"Siemens AG", fact:"Electronics, electrical engineering, and industrial solutions.", level:"Hard", logo:"https://logo.clearbit.com/siemens.com"},
+  {company:"Philips India", owner:"Philips", fact:"Healthcare, lighting, and consumer lifestyle products.", level:"Hard", logo:"https://logo.clearbit.com/philips.com"},
+  {company:"Nestle India", owner:"Nestlé S.A.", fact:"Swiss food and beverage multinational (Maggi, Nescafé).", level:"Hard", logo:"https://logo.clearbit.com/nestle.com"},
+  {company:"PepsiCo India", owner:"PepsiCo Inc.", fact:"Food and beverage multinational (Lays, Kurkure, Pepsi).", level:"Hard", logo:"https://logo.clearbit.com/pepsico.com"},
+  {company:"Coca-Cola India", owner:"The Coca-Cola Company", fact:"Beverage multinational (Coke, Thums Up, Sprite).", level:"Hard", logo:"https://logo.clearbit.com/coca-cola.com"},
+  {company:"BMW India", owner:"BMW Group", fact:"German luxury automobile manufacturer.", level:"Hard", logo:"https://logo.clearbit.com/bmw.in"},
+  {company:"Mercedes-Benz India", owner:"Daimler AG", fact:"German luxury automobile and commercial vehicle manufacturer.", level:"Hard", logo:"https://logo.clearbit.com/mercedes-benz.in"},
+  {company:"Audi India", owner:"Volkswagen Group", fact:"German luxury automobile manufacturer.", level:"Hard", logo:"https://logo.clearbit.com/audi.in"},
+    
+    // --------------------- NEW ADDITIONS: COSMETICS/FMCG ---------------------
+    {company:"Hindustan Unilever (HUL)", owner:"Unilever", fact:"India's largest FMCG company (Surf Excel, Dove, Lux, Brooke Bond).", level:"Hard", logo:"https://logo.clearbit.com/unilever.com"},
+    {company:"P&G India", owner:"Procter & Gamble", fact:"Global FMCG major (Ariel, Pampers, Gillette).", level:"Hard", logo:"https://logo.clearbit.com/pg.com"},
+    {company:"L'Oréal India", owner:"L'Oréal S.A.", fact:"French global beauty products company (Garnier, Maybelline).", level:"Hard", logo:"https://logo.clearbit.com/loreal.com"},
+    {company:"Mamaearth", owner:"Ghazal Alagh & Varun Alagh", fact:"D2C natural, toxin-free personal care brand (Honasa Consumer).", level:"Medium", logo:"https://logo.clearbit.com/mamaearth.in"},
+    {company:"Sugar Cosmetics", owner:"Vineeta Singh & Kaushik Mukherjee", fact:"Fast-growing Indian cosmetics and makeup brand.", level:"Medium", logo:"https://logo.clearbit.com/sugarcosmetics.com"},
+    {company:"Plum Goodness", owner:"Shankar Prasad", fact:"100% vegan, cruelty-free beauty and personal care brand.", level:"Medium", logo:"https://logo.clearbit.com/plumgoodness.com"},
+    {company:"Lakmé", owner:"Hindustan Unilever (HUL)", fact:"India's first cosmetics brand, owned by HUL.", level:"Easy", logo:"https://logo.clearbit.com/lakmeindia.com"},
+    {company:"Himalaya Wellness", owner:"Mohammed Manal (founder)", fact:"Herbal health care and personal care products since 1930.", level:"Medium", logo:"https://logo.clearbit.com/himalayawellness.in"},
+    {company:"Dabur India", owner:"Burman Family", fact:"Ayurvedic and natural consumer goods (Chyawanprash, Honey).", level:"Hard", logo:"https://logo.clearbit.com/dabur.com"},
+    {company:"ITC Ltd.", owner:"Conglomerate", fact:"Diversified Indian conglomerate (Aashirvaad, Sunfeast, Wills, Classic).", level:"Hard", logo:"https://logo.clearbit.com/itcportal.com"},
+    {company:"Emami", owner:"Ghanshyam Das Goenka & Radhe Shyam Agarwal", fact:"Ayurvedic personal care (BoroPlus, Zandu Balm).", level:"Medium", logo:"https://logo.clearbit.com/emamiltd.in"},
+    {company:"Marico", owner:"Harsh Mariwala", fact:"FMCG major (Parachute, Saffola, Livon).", level:"Hard", logo:"https://logo.clearbit.com/marico.com"},
+    {company:"Godrej Consumer Products (GCPL)", owner:"Godrej Group", fact:"FMCG arm of Godrej (Cinthol, Good Knight, Hit).", level:"Hard", logo:"https://logo.clearbit.com/godrejcp.com"},
+    {company:"Cinthol", owner:"Godrej Consumer Products", fact:"Popular Indian soap and personal wash brand.", level:"Easy", logo:""},
+    {company:"Lux", owner:"Hindustan Unilever (HUL)", fact:"Global beauty soap and personal care brand.", level:"Easy", logo:""},
+    {company:"TRESemmé", owner:"Unilever", fact:"Hair care product brand.", level:"Medium", logo:"https://logo.clearbit.com/unilever.com"},
+    {company:"Maybelline New York", owner:"L'Oréal", fact:"Popular global cosmetics brand.", level:"Medium", logo:"https://logo.clearbit.com/loreal.com"},
+    {company:"Forest Essentials", owner:"Mira Kulkarni", fact:"Luxury Ayurvedic beauty brand.", level:"Medium", logo:""},
+
+    // --------------------- NEW ADDITIONS: AUTOMOBILES ---------------------
+    {company:"Hyundai Motor India", owner:"Hyundai Motor Company (S. Korea)", fact:"Second largest car manufacturer in India.", level:"Hard", logo:"https://logo.clearbit.com/hyundai.com"},
+    {company:"Kia India", owner:"Kia Corporation (S. Korea)", fact:"Fastest-growing car brand in India, known for Seltos/Sonet.", level:"Medium", logo:"https://logo.clearbit.com/kia.com"},
+    {company:"Renault India", owner:"Renault S.A. (France)", fact:"French automaker (Kwid, Triber, Kiger).", level:"Medium", logo:"https://logo.clearbit.com/renault.co.in"},
+    {company:"Honda Cars India", owner:"Honda Motor Co. (Japan)", fact:"Japanese multinational automobile manufacturer.", level:"Hard", logo:"https://logo.clearbit.com/hondacarindia.com"},
+    {company:"MG Motor India", owner:"SAIC Motor (China)", fact:"Owned by a Chinese multinational; operates out of UK heritage.", level:"Medium", logo:"https://logo.clearbit.com/mgmotor.co.in"},
+    {company:"Volkswagen India", owner:"Volkswagen Group (Germany)", fact:"German automotive giant.", level:"Hard", logo:"https://logo.clearbit.com/volkswagen.co.in"},
+    {company:"Skoda Auto India", owner:"Volkswagen Group (Germany)", fact:"Czech brand under the VW group.", level:"Medium", logo:"https://logo.clearbit.com/skoda-auto.co.in"},
+    {company:"Hero MotoCorp", owner:"Munjal Family", fact:"India's largest two-wheeler manufacturer (formerly Hero Honda).", level:"Hard", logo:"https://logo.clearbit.com/heromotocorp.com"},
+    {company:"Bajaj Auto", owner:"Bajaj family", fact:"Indian multinational two-wheeler and three-wheeler manufacturer.", level:"Hard", logo:"https://logo.clearbit.com/bajajauto.com"},
+    {company:"TVS Motor", owner:"TVS Group", fact:"Indian multinational motorcycle and scooter manufacturer.", level:"Hard", logo:"https://logo.clearbit.com/tvsmotor.com"},
+    {company:"Royal Enfield", owner:"Eicher Motors", fact:"Indian multinational motorcycle manufacturing company.", level:"Medium", logo:"https://logo.clearbit.com/royalenfield.com"},
+    {company:"Ashok Leyland", owner:"Hinduja Group", fact:"India's second-largest commercial vehicle manufacturer.", level:"Hard", logo:"https://logo.clearbit.com/ashokleyland.com"},
+    {company:"Force Motors", owner:"Firodia Group", fact:"Indian commercial and utility vehicle manufacturer.", level:"Medium", logo:""},
+    {company:"Swaraj Tractors", owner:"Mahindra & Mahindra", fact:"Tractor and farm equipment division.", level:"Medium", logo:""},
+
+    // --------------------- NEW ADDITIONS: SPICES/MASALAS/FMCG ---------------------
+    {company:"MDH Masala", owner:"Mahashay Dharampal Gulati (founder)", fact:"One of India's oldest and most iconic spice blend brands.", level:"Easy", logo:""},
+    {company:"Everest Spices", owner:"Vadilal Shah (founder)", fact:"Leading Indian spice manufacturer.", level:"Medium", logo:""},
+    {company:"Catch Spices", owner:"Dharampal Satyapal Group (DS Group)", fact:"Spices and culinary products brand.", level:"Medium", logo:""},
+    {company:"MTR Foods", owner:"Orkla Group (Norway)", fact:"South Indian ready-to-eat food and spice mix brand.", level:"Medium", logo:"https://logo.clearbit.com/mtrfoods.com"},
+    {company:"Haldiram's", owner:"Agrawal Family", fact:"Indian sweets, snacks, and restaurant chain.", level:"Easy", logo:"https://logo.clearbit.com/haldirams.com"},
+    {company:"Parle Agro", owner:"Chauhan Family", fact:"Beverages and packaged water (Frooti, Appy Fizz, Bailley).", level:"Medium", logo:"https://logo.clearbit.com/parleagro.com"},
+    {company:"Parle Products", owner:"Chauhan Family", fact:"Biscuit and confectionery giant (Parle-G, KrackJack).", level:"Easy", logo:""},
+    {company:"Britannia Industries", owner:"Wadia Group", fact:"Indian food multinational (Biscuits, bread, dairy).", level:"Hard", logo:"https://logo.clearbit.com/britannia.co.in"},
+    {company:"Amul", owner:"Gujarat Co-operative Milk Marketing Federation (GCMMF)", fact:"India's largest dairy brand and cooperative model success.", level:"Easy", logo:"https://logo.clearbit.com/amul.com"},
+    {company:"Mother Dairy", owner:"National Dairy Development Board (NDDB)", fact:"Dairy, edible oils (Dhara), and frozen vegetables.", level:"Medium", logo:"https://logo.clearbit.com/motherdairy.com"},
+    {company:"Patanjali Ayurved", owner:"Baba Ramdev & Balkrishna", fact:"Indian FMCG brand promoting Ayurvedic and natural products.", level:"Easy", logo:"https://logo.clearbit.com/patanjaliayurved.org"},
+    {company:"Unibic", owner:"Food & Beverage", fact:"Australian-origin cookie and biscuit manufacturer, popular in India.", level:"Medium", logo:"https://logo.clearbit.com/unibic.in"},
+    {company:"Aashirvaad", owner:"ITC Ltd.", fact:"Flour (Atta) and packaged food brand.", level:"Easy", logo:"https://logo.clearbit.com/itcportal.com"},
+    {company:"Daawat", owner:"LT Foods", fact:"Premium Indian basmati rice brand.", level:"Medium", logo:""},
+    {company:"Fortune Oil", owner:"Adani Wilmar", fact:"Edible oil brand (Joint Venture of Adani Group & Wilmar).", level:"Medium", logo:""},
+
+    // --------------------- NEW ADDITIONS: MISC TECH/FINANCE/OTHERS (TOTAL 200+ ENTRIES) ---------------------
+    {company:"CREDIT SUISSE", owner:"Financial Institution (now UBS)", fact:"Swiss multinational investment bank.", level:"Hard", logo:"https://logo.clearbit.com/credit-suisse.com"},
+    {company:"Deutsche Bank", owner:"Financial Institution", fact:"German multinational investment bank.", level:"Hard", logo:"https://logo.clearbit.com/db.com"},
+    {company:"Goldman Sachs", owner:"Financial Institution", fact:"Global investment banking firm.", level:"Hard", logo:"https://logo.clearbit.com/goldmansachs.com"},
+    {company:"Morgan Stanley", owner:"Financial Institution", fact:"Global financial services and investment management firm.", level:"Hard", logo:"https://logo.clearbit.com/morganstanley.com"},
+    {company:"Barclays", owner:"Financial Institution", fact:"British universal bank.", level:"Hard", logo:"https://logo.clearbit.com/barclays.com"},
+    {company:"Salesforce", owner:"Marc Benioff (co-founder)", fact:"Global leader in CRM (Customer Relationship Management) software.", level:"Hard", logo:"https://logo.clearbit.com/salesforce.com"},
+    {company:"VMware", owner:"Dell Technologies (acquired)", fact:"Cloud computing and virtualization software.", level:"Hard", logo:"https://logo.clearbit.com/vmware.com"},
+    {company:"McKinsey & Co.", owner:"Management Consulting", fact:"Global management consulting firm ('The Big Three').", level:"Hard", logo:"https://logo.clearbit.com/mckinsey.com"},
+    {company:"BCG (Boston Consulting Group)", owner:"Management Consulting", fact:"Global management consulting firm.", level:"Hard", logo:"https://logo.clearbit.com/bcg.com"},
+    {company:"Bain & Company", owner:"Management Consulting", fact:"Global management consulting firm.", level:"Hard", logo:"https://logo.clearbit.com/bain.com"},
+    {company:"Trivago", owner:"Expedia Group (majority owned)", fact:"Global hotel search engine.", level:"Medium", logo:"https://logo.clearbit.com/trivago.in"},
+    {company:"Glassdoor", owner:"Recruit Holdings", fact:"Employment website with company reviews.", level:"Medium", logo:"https://logo.clearbit.com/glassdoor.com"},
+    {company:"Coursera", owner:"Andrew Ng & Daphne Koller", fact:"Massive Open Online Course (MOOC) provider.", level:"Medium", logo:"https://logo.clearbit.com/coursera.org"},
+    {company:"Udemy", owner:"Eren Bali (co-founder)", fact:"Online learning and teaching marketplace.", level:"Medium", logo:"https://logo.clearbit.com/udemy.com"},
+    {company:"Acko", owner:"Varun Dua", fact:"Digital-only insurance company in India.", level:"Medium", logo:"https://logo.clearbit.com/acko.com"},
+    {company:"Cochin Shipyard", owner:"Government of India", fact:"Largest shipyard in India (public sector undertaking).", level:"Hard", logo:"https://logo.clearbit.com/cochinshipyard.in"},
+    {company:"BEL (Bharat Electronics Ltd)", owner:"Government of India", fact:"Navaratna PSU aerospace and defence electronics company.", level:"Hard", logo:"https://logo.clearbit.com/bel-india.in"},
+    {company:"ISRO", owner:"Government of India (DOS)", fact:"Indian Space Research Organisation.", level:"Hard", logo:"https://logo.clearbit.com/isro.gov.in"},
+    {company:"DRDO", owner:"Government of India (MOD)", fact:"Defence Research and Development Organisation.", level:"Hard", logo:""},
+    {company:"BHEL (Bharat Heavy Electricals)", owner:"Government of India", fact:"Indian state-owned engineering and manufacturing company.", level:"Hard", logo:"https://logo.clearbit.com/bhel.com"},
+    {company:"SAIL (Steel Authority of India)", owner:"Government of India", fact:"Largest steel-making company in India (PSU).", level:"Hard", logo:"https://logo.clearbit.com/sail.co.in"},
+    {company:"ONGC", owner:"Government of India", fact:"Oil and Natural Gas Corporation (Maharatna PSU).", level:"Hard", logo:"https://logo.clearbit.com/ongc.co.in"},
+    {company:"GAIL (India) Ltd", owner:"Government of India", fact:"Largest state-owned natural gas processing and distribution company.", level:"Hard", logo:"https://logo.clearbit.com/gailonline.com"},
+    {company:"HPCL", owner:"Government of India (ONGC subsidiary)", fact:"Hindustan Petroleum Corporation Limited.", level:"Hard", logo:"https://logo.clearbit.com/hindustanpetroleum.com"},
+    {company:"Colgate-Palmolive India", owner:"Colgate-Palmolive", fact:"Toothpaste and oral care products leader.", level:"Hard", logo:"https://logo.clearbit.com/colgate.com"},
+    {company:"Gillette India", owner:"Procter & Gamble", fact:"Men's grooming products (P&G subsidiary).", level:"Medium", logo:"https://logo.clearbit.com/gillette.com"},
+    {company:"Wagh Bakri Tea", owner:"Piyush Desai", fact:"Popular Indian tea brand.", level:"Medium", logo:"https://logo.clearbit.com/waghbakritea.com"},
+    {company:"Vardhman Textiles", owner:"Neeraj Jain (CEO)", fact:"One of the largest textile manufacturing companies in India.", level:"Hard", logo:"https://logo.clearbit.com/vardhman.com"},
+    {company:"JSW Group", owner:"Sajjan Jindal", fact:"Indian multinational conglomerate (Steel, Energy, Infrastructure).", level:"Hard", logo:"https://logo.clearbit.com/jsw.in"},
+    {company:"PVR INOX", owner:"Ajay Bijli (founder)", fact:"Largest cinema exhibition company in India (merger of PVR & Inox).", level:"Medium", logo:"https://logo.clearbit.com/pvrcinemas.com"},
+];
+/********* Table Pagination & Search *********/
+const rowsPerPage = 10;
+let currentPage = 1, filtered = companies.slice();
+const tableBody = document.querySelector('#learnTable tbody');
+const pagination = document.getElementById('pagination');
+const tableInfo = document.getElementById('tableInfo');
+const searchInput = document.getElementById('searchInput');
+let currentLevel = "All";
+
+// Render table
+function renderTable(){
+  const start = (currentPage-1)*rowsPerPage;
+  const pageItems = filtered.slice(start, start+rowsPerPage);
+  tableBody.innerHTML = '';
+  pageItems.forEach((c, idx)=>{
+    const seq = start+idx+1;
+    const logoSrc = c.logo || initialsSVG(c.company);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${seq}</td>
+      <td><span class="mini-logo"><img src="${logoSrc}" alt="" onerror="this.onerror=null; this.src='${initialsSVG(c.company)}'"></span>${c.company}</td>
+      <td>${c.owner||'—'}</td>
+      <td>${c.fact||'—'}</td>`;
+    tableBody.appendChild(tr);
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length/rowsPerPage));
+  pagination.innerHTML = '';
+  pagination.appendChild(makePageBtn('Prev',()=>{if(currentPage>1){currentPage--; renderTable();}}));
+
+  const windowSize = 5;
+  let startPage = Math.max(1,currentPage-Math.floor(windowSize/2));
+  let endPage = Math.min(totalPages,startPage+windowSize-1);
+  if(endPage-startPage<windowSize-1) startPage = Math.max(1,endPage-windowSize+1);
+
+  for(let p=startPage;p<=endPage;p++){
+    const btn = makePageBtn(p,()=>{currentPage=p;renderTable();});
+    if(p===currentPage) btn.style.fontWeight='800';
+    pagination.appendChild(btn);
+  }
+
+  pagination.appendChild(makePageBtn('Next',()=>{if(currentPage<totalPages){currentPage++;renderTable();}}));
+
+  tableInfo.textContent = `Showing ${Math.min(filtered.length,start+1)}-${Math.min(filtered.length,start+rowsPerPage)} of ${filtered.length} companies`;
+}
+function makePageBtn(label,onClick){ const b=document.createElement('button'); b.className='page-btn'; b.textContent=label; b.onclick=onClick; return b; }
+
+// Search & Filter
+searchInput.addEventListener('input', filterAndRender);
+document.querySelectorAll('.level-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentLevel = btn.dataset.level;
+    filterAndRender();
+  });
+});
+
+function filterAndRender(){
+  const q = searchInput.value.trim().toLowerCase();
+  filtered = companies.filter(c=>{
+    const matchesLevel = (currentLevel==="All") || (c.level===currentLevel);
+    const matchesSearch = (c.company||'').toLowerCase().includes(q) || 
+                          (c.owner||'').toLowerCase().includes(q) || 
+                          (c.fact||'').toLowerCase().includes(q);
+    return matchesLevel && matchesSearch;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+// Animated background circles
+for(let i=0;i<10;i++){
+  const circle=document.createElement('div');
+  circle.className='bg-circle';
+  const size=Math.random()*200+50;
+  circle.style.width=circle.style.height=size+'px';
+  circle.style.left=Math.random()*100+'%';
+  circle.style.top=Math.random()*100+'%';
+  circle.style.background=['#ffd166','#7af0c9','#60a5fa','#a78bfa','#ffb86b'][Math.floor(Math.random()*5)];
+  circle.style.animationDuration=(10+Math.random()*10)+'s';
+  document.body.appendChild(circle);
+}
+
+
+renderTable();
+</script>
+</body>
+</html>

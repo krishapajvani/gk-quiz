@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Who Owns It? — CMAT Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#0f172a; --bg2:#081028; --accent:#7af0c9; --accent2:#ffd166;
+  --radius:14px; --glass: rgba(255,255,255,0.03); --muted:#9fd8ff66;
+  --highlight:#7af0c9;
+  --wrong: #f87171;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Inter', sans-serif;
+  background: linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:#e6eef8;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px;
+  position:relative;
+}
+
+.wrap{
+  max-width:1100px;
+  width:100%;
+  text-align:center;
+  padding:40px;
+  border-radius:var(--radius);
+  background:var(--glass);
+  backdrop-filter: blur(12px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  position:relative;
+  z-index:2;
+}
+
+h1{
+  font-size:32px;
+  margin-bottom:12px;
+}
+
+p.intro{
+  color:var(--muted);
+  margin-bottom:28px;
+  font-size:16px;
+}
+
+.main-layout {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.modules-container {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.sidebar-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  position: sticky;
+  top: 28px;
+}
+
+button{
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border:none;
+  padding:14px 22px;
+  border-radius:12px;
+  color:#012;
+  font-weight:700;
+  cursor:pointer;
+  margin:8px;
+  min-width:180px;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+button:hover{
+  transform: scale(1.05);
+  box-shadow:0 8px 20px rgba(0,0,0,0.4);
+}
+button.ghost{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.06);
+  color:inherit;
+}
+
+.module-section {
+  padding: 20px;
+  border-radius: var(--radius);
+  background: rgba(255,255,255,0.05);
+  text-align: left;
+  transition: transform 0.2s;
+  width: 100%;
+}
+.module-section h3 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  color: var(--accent);
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 5px;
+}
+.module-section p {
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+.module-section .actions {
+    text-align: center;
+}
+.module-section .actions button {
+  margin: 4px;
+  padding: 10px 14px;
+  min-width: 140px;
+  font-size: 0.9rem;
+}
+
+.master-quiz-actions {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: var(--radius);
+    text-align: center;
+}
+.master-quiz-actions p {
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent2);
+}
+.master-quiz-actions button {
+  width: 100%; /* Make full-width */
+  min-width: unset; /* Remove min-width for flexibility */
+  margin-top: 15px;
+  background: linear-gradient(90deg, #ffb86b, #ff79c6);
+}
+
+#leaderboard{
+  text-align:left;
+  background:rgba(255,255,255,0.05);
+  padding:16px;
+  border-radius:12px;
+  max-height:380px;
+  overflow-y:auto;
+}
+#leaderboard h3{
+  margin-top:0;
+  margin-bottom:15px;
+  font-size:18px;
+  color:var(--accent2);
+  padding-left: 5px;
+}
+#scoreList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.score-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    border-left: 4px solid transparent;
+    transition: background 0.3s;
+}
+.score-rank {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--muted);
+    min-width: 25px;
+    text-align: center;
+}
+.score-details {
+    flex-grow: 1;
+}
+.score-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+}
+.score-value .total {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+.score-category {
+    font-size: 0.8rem;
+    color: var(--accent);
+    opacity: 0.8;
+}
+.score-date {
+    font-size: 0.8rem;
+    color: var(--muted);
+    white-space: nowrap;
+}
+.score-entry.top-score {
+    background: rgba(122,240,201,0.1);
+    border-left-color: var(--accent);
+}
+.score-entry.top-score .score-rank {
+    color: var(--accent);
+}
+.score-entry.stopped-quiz {
+    opacity: 0.7;
+    border-left-color: var(--wrong);
+}
+
+.bg-circle {
+  position:absolute;
+  border-radius:50%;
+  opacity:0.1;
+  animation: float 15s infinite linear;
+  z-index:-1;
+}
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg);}
+  50% { transform: translateY(-50px) rotate(180deg);}
+  100% { transform: translateY(0px) rotate(360deg);}
+}
+
+
+/* --- FULLY RESPONSIVE MOBILE FIXES --- */
+@media (max-width: 950px) {
+    body {
+        /* Align content to the top for natural scrolling */
+        align-items: flex-start;
+        padding: 15px; /* Reduce outer padding */
+    }
+    .wrap {
+        /* Reduce card padding and add top margin */
+        padding: 25px 20px;
+        margin-top: 15px;
+    }
+    h1 {
+        font-size: 26px; /* Smaller main title */
+    }
+    p.intro {
+        font-size: 15px; /* Smaller intro text */
+        margin-bottom: 30px;
+    }
+    .main-layout {
+        flex-direction: column; /* Stack main columns */
+    }
+    .sidebar-container {
+        position: static; /* Remove sticky behavior on mobile */
+        width: 100%;
+        top: 0;
+    }
+    /* Make module buttons more flexible */
+    .module-section .actions {
+        display: flex;
+        flex-wrap: wrap; /* Allow buttons to wrap to the next line */
+        justify-content: center;
+    }
+    .module-section .actions button {
+        min-width: 160px; /* Adjust min-width if needed */
+        flex-grow: 1; /* Allow buttons to grow and fill space */
+    }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Who Owns It? — CMAT Knowledge Hub 🧠</h1>
+  <p class="intro">Select a learning module or start the combined quiz challenge!</p>
+  
+  <div class="main-layout">
+      
+      <div class="modules-container">
+          <div class="module-section">
+              <h3>🏢 Core Companies & Startups</h3>
+              <p>Tech, FMCG, Global. Filtered by Easy, Medium, Hard difficulty.</p>
+              <div class="actions">
+                  <button onclick="location.href='learn.html'">📘 Learn Data</button>
+                  <button onclick="location.href='quiz.html'" class="ghost">▶️ Take Quiz</button>
+              </div>
+          </div>
+
+          <div class="module-section">
+              <h3>⭐ Celebrity Ventures</h3>
+              <p>Brands owned by Actors, Singers, Cricketers, and other public figures.</p>
+              <div class="actions">
+                  <button onclick="location.href='own_brands.html'">📘 Learn Data</button>
+                  <button onclick="location.href='quiz.html'" class="ghost">▶️ Take Quiz</button>
+              </div>
+          </div>
+
+          <div class="module-section">
+              <h3>🏏 IPL Franchise Owners</h3>
+              <p>Identify the corporate or celebrity groups that own the major IPL teams.</p>
+              <div class="actions">
+                  <button onclick="location.href='ipl_owners.html'">📘 Learn Data</button>
+                  <button onclick="location.href='quiz.html'" class="ghost">▶️ Take Quiz</button>
+              </div>
+          </div>
+      </div>
+      
+      <div class="sidebar-container">
+          <div class="master-quiz-actions">
+              <p>🔥 Master Quiz Challenge</p>
+              <button onclick="location.href='quiz.html'">🚀 Start Master Quiz</button>
+          </div>
+
+          <div id="leaderboard">
+              <h3>🏆 Top Scores</h3>
+              <div id="scoreList"></div>
+          </div>
+      </div>
+      
+  </div> 
+</div> 
+
+<script>
+function loadLeaderboard(){
+  const leaderboard = JSON.parse(localStorage.getItem('companyQuizLeaderboard') || '[]');
+  const list = document.getElementById('scoreList');
+  list.innerHTML = '';
+
+  if(leaderboard.length === 0){
+    const emptyMsg = document.createElement('div');
+    emptyMsg.textContent = 'No scores yet. Play a quiz!';
+    emptyMsg.style.color = 'var(--muted)';
+    emptyMsg.style.padding = '10px';
+    list.appendChild(emptyMsg);
+    return;
+  }
+
+  leaderboard.sort((a,b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return new Date(b.date) - new Date(a.date);
+  });
+
+  leaderboard.forEach((entry, index) => {
+    const scoreEntryDiv = document.createElement('div');
+    scoreEntryDiv.className = 'score-entry';
+
+    const rank = index + 1;
+    const total = entry.total !== undefined ? entry.total : '??';
+    const category = entry.category || 'Any';
+    const level = entry.level || 'Any';
+    const date = entry.date ? new Date(entry.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A';
+
+    if (index === 0 && !entry.stopped) {
+        scoreEntryDiv.classList.add('top-score');
+    }
+    if (entry.stopped) {
+        scoreEntryDiv.classList.add('stopped-quiz');
+    }
+
+    scoreEntryDiv.innerHTML = `
+        <div class="score-rank">${rank}</div>
+        <div class="score-details">
+            <div class="score-value">${entry.score} <span class="total">/ ${total}</span></div>
+            <div class="score-category">${category} | ${level}</div>
+        </div>
+        <div class="score-date">${entry.stopped ? '⚠️ ' : ''}${date}</div>
+    `;
+    
+    list.appendChild(scoreEntryDiv);
+  });
+}
+
+// Run on page load
+loadLeaderboard();
+
+// Animated background circles
+for(let i=0;i<10;i++){
+  const circle=document.createElement('div');
+  circle.className='bg-circle';
+  const size=Math.random()*200+50;
+  circle.style.width=circle.style.height=size+'px';
+  circle.style.left=Math.random()*100+'%';
+  circle.style.top=Math.random()*100+'%';
+  circle.style.background=['#ffd166','#7af0c9','#60a5fa','#a78bfa','#ffb86b'][Math.floor(Math.random()*5)];
+  circle.style.animationDuration=(12 + Math.random()*10)+'s';
+  document.body.appendChild(circle);
+}
+</script>
+</body>
+</html>

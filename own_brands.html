@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Companies — Celebrity-Owned Brands</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#0f172a; --bg2:#081028; --card:#071730;
+  --accent:#7af0c9; --accent2:#ffd166; --muted:#9fd8ff66;
+  --radius:14px;
+}
+body{
+  margin:0;
+  font-family:'Inter', sans-serif;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:#e6eef8;
+  padding:16px;
+}
+.wrap{
+  max-width:1100px;
+  margin:auto;
+}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));
+  padding:18px;
+  border-radius:var(--radius);
+  box-shadow:0 10px 40px rgba(2,6,23,0.6);
+}
+.controls-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:12px;
+}
+.search{
+  padding:8px;
+  border-radius:10px;
+  background:#021428;
+  border:1px solid rgba(255,255,255,0.03);
+  color:inherit;
+  min-width:160px;
+  flex:1;
+}
+.level-btn{
+  padding:6px 12px;
+  border-radius:10px;
+  background:#021428;
+  border:1px solid rgba(255,255,255,0.03);
+  color:inherit;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.2s;
+}
+.level-btn:hover, .level-btn.active{
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#012;
+  transform:scale(1.05);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+  margin-top:12px;
+}
+th,td{
+  padding:10px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+}
+th{color:#ffeaa7;font-weight:700;font-size:13px;}
+.mini-logo{width:44px;height:44px;border-radius:8px;background:#fff;display:inline-block;vertical-align:middle;margin-right:8px;overflow:hidden;}
+.mini-logo img{width:100%;height:100%;object-fit:contain;display:block;}
+.pagination{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;}
+.page-btn{padding:7px 9px;border-radius:8px;background:transparent;border:1px solid white;cursor:pointer;color:#ffeaa7}
+.page-btn:hover{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#012;transform:scale(1.05);}
+#tableInfo{font-size:13px;color:#9fd8ff66;margin-top:4px;}
+.back-btn{
+  margin-bottom:12px;
+  padding:10px 16px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#012;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.2s;
+}
+.back-btn:hover{transform:scale(1.05); box-shadow:0 6px 18px rgba(0,0,0,0.4);}
+@media(max-width:600px){
+  .mini-logo{width:36px;height:36px;}
+  th,td{padding:6px 8px;font-size:12px;}
+  .search{min-width:120px;}
+}
+.bg-circle {
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: float 15s infinite linear;
+  z-index: 1;
+}
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-50px) rotate(180deg); }
+  100% { transform: translateY(0px) rotate(360deg); }
+}
+body {
+  position: relative;
+}
+.wrap {
+  position: relative;
+  z-index: 2;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <button class="back-btn" onclick="location.href='index.html'">⬅ Back to Dashboard</button>
+  <div class="card">
+    <h2>🌟 Learn — Celebrity-Owned Brands & Ventures</h2>
+    <div class="controls-row">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="level-btn active" data-level="All">All</button>
+        <button class="level-btn" data-level="Actor/Actress">Actor/Actress</button>
+        <button class="level-btn" data-level="Cricketer">Cricketer</button>
+        <button class="level-btn" data-level="Other/Production">Other Ventures</button>
+      </div>
+      <input id="searchInput" class="search" placeholder="Search celebrity or brand..." />
+      <div class="pagination" id="pagination">
+    </div>
+    </div>
+    <table id="learnTable">
+      <thead>
+        <tr><th>#</th><th>Celebrity (Type)</th><th>Brand Name</th><th>Brand Fact / Category</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+<div id="tableInfo"></div>
+</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+      
+  </div>
+</div>
+
+<script>
+/********* Utility for fallback logo *********/
+function initialsSVG(name,w=80,h=80){
+  const initials = (name||'').split(/\s+/).slice(0,2).map(n=>n[0]||'').join('').toUpperCase() || '?';
+  const colors = ['#ffd166','#7af0c9','#60a5fa','#a78bfa','#ffb86b'];
+  const bg = colors[Math.abs(hashCode(name||'')) % colors.length];
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>
+    <rect width='100%' height='100%' rx='12' fill='${bg}'/>
+    <text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='Inter,Arial' font-size='24' fill='#012'>${initials}</text>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+function hashCode(s){ return s.split('').reduce((a,b)=>((a<<5)-a)+b.charCodeAt(0),0)|0; }
+
+/********* Celebrity-Owned Brands Data (30+ entries) *********/
+const companies = [
+  // *** ACTORS/ACTRESSES OWNED BRANDS ***
+  {company:"Salman Khan", owner:"Being Human", fact:"Charitable foundation funded by clothing, watches, and e-cycle sales.", level:"Actor/Actress", logo:"https://logo.clearbit.com/beinghumanclothing.com"},
+  {company:"Deepika Padukone", owner:"82°E", fact:"Modern Indian self-care and skincare brand.", level:"Actor/Actress", logo:"https://logo.clearbit.com/82e.com"},
+  {company:"Deepika Padukone", owner:"All About You", fact:"Clothing line for women (co-owned, acquired by Myntra).", level:"Actor/Actress", logo:"https://logo.clearbit.com/myntra.com"},
+  {company:"Hrithik Roshan", owner:"HRX", fact:"Athleisure and lifestyle clothing/accessories brand.", level:"Actor/Actress", logo:"https://logo.clearbit.com/hrx.com"},
+  {company:"Katrina Kaif", owner:"Kay Beauty", fact:"Cosmetics brand co-created with Nykaa.", level:"Actor/Actress", logo:"https://logo.clearbit.com/nykaa.com"},
+  {company:"Alia Bhatt", owner:"Ed-a-Mamma", fact:"Sustainable children's and maternity clothing brand (acquired by Reliance Retail).", level:"Actor/Actress", logo:""},
+  {company:"Kriti Sanon", owner:"Hyphen", fact:"Skincare brand launched in 2023.", level:"Actor/Actress", logo:""},
+  {company:"Kriti Sanon", owner:"The Tribe", fact:"Co-founder of this fitness studio chain/community.", level:"Actor/Actress", logo:""},
+  {company:"Anushka Sharma", owner:"Nush", fact:"Women's casual and semi-formal clothing brand.", level:"Actor/Actress", logo:""},
+  {company:"Saif Ali Khan", owner:"House of Pataudi", fact:"Ethnic wear brand launched in partnership with Myntra.", level:"Actor/Actress", logo:"https://logo.clearbit.com/myntra.com"},
+  {company:"Shahid Kapoor", owner:"SKULT", fact:"Men's athleisure brand (Athletic + Cult).", level:"Actor/Actress", logo:""},
+  {company:"Tiger Shroff", owner:"Prowl", fact:"Activewear and fitness accessories brand.", level:"Actor/Actress", logo:""},
+  {company:"Suniel Shetty", owner:"S2 Ventures", fact:"Investment firm and promoter of wellness/fitness startups (e.g., Aquatein).", level:"Actor/Actress", logo:""},
+  {company:"Priyanka Chopra Jonas", owner:"Anomaly", fact:"Haircare brand launched globally, also available in India.", level:"Actor/Actress", logo:""},
+  {company:"Shilpa Shetty", owner:"DreamSS", fact:"Women's sleepwear, loungewear, and leisure wear.", level:"Actor/Actress", logo:""},
+  {company:"Shraddha Kapoor", owner:"Imara", fact:"Indo-fusion women's clothing line.", level:"Actor/Actress", logo:""},
+  
+  // *** CRICKETERS OWNED BRANDS ***
+  {company:"Virat Kohli", owner:"Wrogn", fact:"Youth-focused, unconventional men's casual wear brand (co-created).", level:"Cricketer", logo:"https://logo.clearbit.com/wrogn.com"},
+  {company:"Virat Kohli", owner:"One8", fact:"Apparel, shoes, and fragrance brand in collaboration with Puma.", level:"Cricketer", logo:"https://logo.clearbit.com/puma.com"},
+  {company:"Sachin Tendulkar", owner:"True Blue", fact:"Premium Indian menswear apparel brand (JV with Arvind Fashion Brands).", level:"Cricketer", logo:""},
+  {company:"MS Dhoni", owner:"Seven (SEVEN)", fact:"Lifestyle brand focused on clothing, footwear, and fitness equipment.", level:"Cricketer", logo:""},
+  {company:"Yuvraj Singh", owner:"YWC (YouWeCan)", fact:"Fashion brand whose proceeds go to his cancer awareness foundation.", level:"Cricketer", logo:""},
+  {company:"Hardik Pandya", owner:"HP (Hardik Pandya)", fact:"Personal logo used for collaborations and merchandise.", level:"Cricketer", logo:""},
+  
+  // *** OTHER / PRODUCTION HOUSES / INVESTMENT ***
+  {company:"Shah Rukh Khan", owner:"Red Chillies Ent.", fact:"Film production, distribution, and VFX studio (Co-owner: Gauri Khan).", level:"Other/Production", logo:""},
+  {company:"Shah Rukh Khan", owner:"Kolkata Knight Riders (KKR)", fact:"Co-owner of the IPL cricket team.", level:"Other/Production", logo:""},
+  {company:"Akshay Kumar", owner:"Hari Om Ent.", fact:"Film production company.", level:"Other/Production", logo:""},
+  {company:"Ajay Devgn", owner:"Ajay Devgn FFilms", fact:"Film production and distribution house.", level:"Other/Production", logo:""},
+  {company:"Priyanka Chopra Jonas", owner:"Purple Pebble Pictures", fact:"Film production company focused on regional Indian cinema.", level:"Other/Production", logo:""},
+  {company:"Karan Johar", owner:"Dharma Productions", fact:"One of India's largest and most famous film production houses.", level:"Other/Production", logo:""},
+  {company:"Farhan Akhtar", owner:"Excel Entertainment", fact:"Film production company (Co-owner: Ritesh Sidhwani).", level:"Other/Production", logo:""},
+  {company:"Sunil Chhetri (Footballer)", owner:"SC11", fact:"Personal brand for merchandise and fitness gear.", level:"Other/Production", logo:""},
+  {company:"Badshah (Rapper)", owner:"Badfit", fact:"Fitness and fashion apparel brand.", level:"Other/Production", logo:""},
+  {company:"Ranveer Singh", owner:"Bold Care", fact:"Strategic investor & co-founder in a sexual wellness D2C startup.", level:"Actor/Actress", logo:""},
+];
+
+// Reusing the script logic from the original learn.html
+const rowsPerPage = 10;
+let currentPage = 1, filtered = companies.slice();
+const tableBody = document.querySelector('#learnTable tbody');
+const pagination = document.getElementById('pagination');
+const tableInfo = document.getElementById('tableInfo');
+const searchInput = document.getElementById('searchInput');
+let currentLevel = "All";
+
+// Render table
+function renderTable(){
+  const start = (currentPage-1)*rowsPerPage;
+  const pageItems = filtered.slice(start, start+rowsPerPage);
+  tableBody.innerHTML = '';
+  pageItems.forEach((c, idx)=>{
+    const seq = start+idx+1;
+    const logoSrc = c.logo || initialsSVG(c.owner); 
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${seq}</td>
+      <td><span class="mini-logo"><img src="${logoSrc}" alt="" onerror="this.onerror=null; this.src='${initialsSVG(c.owner)}'"></span>${c.company} (${c.level.split('/')[0]})</td>
+      <td><strong>${c.owner||'—'}</strong></td>
+      <td>${c.fact||'—'}</td>`;
+    tableBody.appendChild(tr);
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length/rowsPerPage));
+  pagination.innerHTML = '';
+  pagination.appendChild(makePageBtn('Prev',()=>{if(currentPage>1){currentPage--; renderTable();}}));
+
+  const windowSize = 5;
+  let startPage = Math.max(1,currentPage-Math.floor(windowSize/2));
+  let endPage = Math.min(totalPages,startPage+windowSize-1);
+  if(endPage-startPage<windowSize-1) startPage = Math.max(1,endPage-windowSize+1);
+
+  for(let p=startPage;p<=endPage;p++){
+    const btn = makePageBtn(p,()=>{currentPage=p;renderTable();});
+    if(p===currentPage) btn.style.fontWeight='800';
+    pagination.appendChild(btn);
+  }
+
+  pagination.appendChild(makePageBtn('Next',()=>{if(currentPage<totalPages){currentPage++;renderTable();}}));
+
+  tableInfo.textContent = `Showing ${Math.min(filtered.length,start+1)}-${Math.min(filtered.length,start+rowsPerPage)} of ${filtered.length} owned ventures`;
+}
+function makePageBtn(label,onClick){ const b=document.createElement('button'); b.className='page-btn'; b.textContent=label; b.onclick=onClick; return b; }
+
+// Search & Filter
+searchInput.addEventListener('input', filterAndRender);
+document.querySelectorAll('.level-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentLevel = btn.dataset.level;
+    filterAndRender();
+  });
+});
+
+function filterAndRender(){
+  const q = searchInput.value.trim().toLowerCase();
+  filtered = companies.filter(c=>{
+    const matchesLevel = (currentLevel==="All") || (c.level.includes(currentLevel));
+    const matchesSearch = (c.company||'').toLowerCase().includes(q) ||
+                          (c.owner||'').toLowerCase().includes(q) ||
+                          (c.fact||'').toLowerCase().includes(q) ||
+                          (c.level||'').toLowerCase().includes(q);
+    return matchesLevel && matchesSearch;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+// Animated background circles (copied from original)
+for(let i=0;i<10;i++){
+  const circle=document.createElement('div');
+  circle.className='bg-circle';
+  const size=Math.random()*200+50;
+  circle.style.width=circle.style.height=size+'px';
+  circle.style.left=Math.random()*100+'%';
+  circle.style.top=Math.random()*100+'%';
+  circle.style.background=['#ffd166','#7af0c9','#60a5fa','#a78bfa','#ffb86b'][Math.floor(Math.random()*5)];
+  circle.style.animationDuration=(10+Math.random()*10)+'s';
+  document.body.appendChild(circle);
+}
+
+
+renderTable();
+</script>
+</body>
+</html>

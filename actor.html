@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Companies — Actor/Influencer Endorsements</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#0f172a; --bg2:#081028; --card:#071730;
+  --accent:#7af0c9; --accent2:#ffd166; --muted:#9fd8ff66;
+  --radius:14px;
+}
+body{
+  margin:0;
+  font-family:'Inter', sans-serif;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:#e6eef8;
+  padding:16px;
+}
+.wrap{
+  max-width:1100px;
+  margin:auto;
+}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));
+  padding:18px;
+  border-radius:var(--radius);
+  box-shadow:0 10px 40px rgba(2,6,23,0.6);
+}
+.controls-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:12px;
+}
+.search{
+  padding:8px;
+  border-radius:10px;
+  background:#021428;
+  border:1px solid rgba(255,255,255,0.03);
+  color:inherit;
+  min-width:160px;
+  flex:1;
+}
+.level-btn{
+  padding:6px 12px;
+  border-radius:10px;
+  background:#021428;
+  border:1px solid rgba(255,255,255,0.03);
+  color:inherit;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.2s;
+}
+.level-btn:hover, .level-btn.active{
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#012;
+  transform:scale(1.05);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+  margin-top:12px;
+}
+th,td{
+  padding:10px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+}
+th{color:#ffeaa7;font-weight:700;font-size:13px;}
+.mini-logo{width:44px;height:44px;border-radius:8px;background:#fff;display:inline-block;vertical-align:middle;margin-right:8px;overflow:hidden;}
+.mini-logo img{width:100%;height:100%;object-fit:contain;display:block;}
+.pagination{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;}
+.page-btn{padding:7px 9px;border-radius:8px;background:transparent;border:1px solid white;cursor:pointer;color:#ffeaa7}
+.page-btn:hover{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#012;transform:scale(1.05);}
+#tableInfo{font-size:13px;color:#9fd8ff66;margin-top:4px;}
+.back-btn{
+  margin-bottom:12px;
+  padding:10px 16px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  color:#012;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.2s;
+}
+.back-btn:hover{transform:scale(1.05); box-shadow:0 6px 18px rgba(0,0,0,0.4);}
+@media(max-width:600px){
+  .mini-logo{width:36px;height:36px;}
+  th,td{padding:6px 8px;font-size:12px;}
+  .search{min-width:120px;}
+}
+.bg-circle {
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: float 15s infinite linear;
+  z-index: 1;
+}
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-50px) rotate(180deg); }
+  100% { transform: translateY(0px) rotate(360deg); }
+}
+body {
+  position: relative;
+}
+.wrap {
+  position: relative;
+  z-index: 2;
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <button class="back-btn" onclick="location.href='index.html'">⬅ Back to Dashboard</button>
+  <div class="card">
+    <h2>🎬 Learn — Actor/Influencer Brand Endorsements</h2>
+    <div class="controls-row">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="level-btn active" data-level="All">All</button>
+        <button class="level-btn" data-level="Actor">Actor</button>
+        <button class="level-btn" data-level="Actress">Actress</button>
+        <button class="level-btn" data-level="Influencer">Influencer</button>
+      </div>
+      <input id="searchInput" class="search" placeholder="Search celebrity or brand..." />
+      <div class="pagination" id="pagination">
+    </div>
+    </div>
+    <table id="learnTable">
+      <thead>
+        <tr><th>#</th><th>Celebrity (Type)</th><th>Brand Name</th><th>Brand Fact / Category</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+<div id="tableInfo"></div>
+</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+      
+  </div>
+</div>
+
+<script>
+/********* Utility for fallback logo *********/
+function initialsSVG(name,w=80,h=80){
+  const initials = (name||'').split(/\s+/).slice(0,2).map(n=>n[0]||'').join('').toUpperCase() || '?';
+  const colors = ['#ffd166','#7af0c9','#60a5fa','#a78bfa','#ffb86b'];
+  const bg = colors[Math.abs(hashCode(name||'')) % colors.length];
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>
+    <rect width='100%' height='100%' rx='12' fill='${bg}'/>
+    <text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='Inter,Arial' font-size='24' fill='#012'>${initials}</text>
+  </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+function hashCode(s){ return s.split('').reduce((a,b)=>((a<<5)-a)+b.charCodeAt(0),0)|0; }
+
+/********* Endorsements Data *********/
+const companies = [
+  // *** ACTORS (Male) ***
+  {company:"Shah Rukh Khan", owner:"BigBasket", fact:"Online grocery delivery platform.", level:"Actor", logo:"https://logo.clearbit.com/bigbasket.com"},
+  {company:"Shah Rukh Khan", owner:"Hyundai India", fact:"South Korean automotive manufacturer.", level:"Actor", logo:"https://logo.clearbit.com/hyundai.com"},
+  {company:"Amitabh Bachchan", owner:"Dabur", fact:"Indian consumer goods company.", level:"Actor", logo:"https://logo.clearbit.com/dabur.com"},
+  {company:"Amitabh Bachchan", owner:"FirstCry", fact:"E-commerce for baby and kids products.", level:"Actor", logo:"https://logo.clearbit.com/firstcry.com"},
+  {company:"Akshay Kumar", owner:"Road Safety Campaign (Govt)", fact:"Promoting safe driving practices.", level:"Actor", logo:""},
+  {company:"Akshay Kumar", owner:"Harsha Engineers", fact:"Precision bearing cages manufacturer.", level:"Actor", logo:""},
+  {company:"Ranveer Singh", owner:"Llyod", fact:"Home electronics and appliances.", level:"Actor", logo:""},
+  {company:"Ranveer Singh", owner:"Boat", fact:"Indian audio and wearables brand.", level:"Actor", logo:"https://logo.clearbit.com/boat-lifestyle.com"},
+  {company:"Salman Khan", owner:"Thums Up (Coca-Cola)", fact:"Carbonated soft drink brand.", level:"Actor", logo:"https://logo.clearbit.com/coca-cola.com"},
+  {company:"Hrithik Roshan", owner:"RummyCircle", fact:"Online rummy gaming platform.", level:"Actor", logo:""},
+  {company:"Ayushmann Khurrana", owner:"Titan Eyeplus", fact:"Eyewear retail chain by Titan Company.", level:"Actor", logo:"https://logo.clearbit.com/titaneyeplus.com"},
+  {company:"Ranbir Kapoor", owner:"Oppo", fact:"Chinese consumer electronics and mobile.", level:"Actor", logo:"https://logo.clearbit.com/oppo.com"},
+  {company:"Vicky Kaushal", owner:"PNB Housing", fact:"Housing finance company.", level:"Actor", logo:""},
+  {company:"Siddharth Malhotra", owner:"Being Human", fact:"Salman Khan's charitable clothing brand.", level:"Actor", logo:""},
+  {company:"Varun Dhawan", owner:"Puma India", fact:"Sportswear and accessories brand.", level:"Actor", logo:"https://logo.clearbit.com/puma.com"},
+  {company:"Shahid Kapoor", owner:"Beardo", fact:"Men's grooming and lifestyle products.", level:"Actor", logo:""},
+  {company:"Kartik Aaryan", owner:"McDonald's India", fact:"Quick Service Restaurant (QSR) chain.", level:"Actor", logo:"https://logo.clearbit.com/mcdonalds.com"},
+  {company:"Tiger Shroff", owner:"Garnier Men", fact:"Men's personal care brand.", level:"Actor", logo:""},
+  {company:"Allu Arjun (South)", owner:"Frooti", fact:"Mango-flavored drink.", level:"Actor", logo:""},
+  {company:"Yash (South)", owner:"Beetel", fact:"Communication and digital devices.", level:"Actor", logo:""},
+  
+  // *** ACTRESSES (Female) ***
+  {company:"Alia Bhatt", owner:"Maybelline New York", fact:"Cosmetics brand owned by L'Oréal.", level:"Actress", logo:"https://logo.clearbit.com/loreal.com"},
+  {company:"Alia Bhatt", owner:"Blender's Pride", fact:"Indian whiskey brand.", level:"Actress", logo:""},
+  {company:"Deepika Padukone", owner:"Levi's", fact:"American clothing company, famous for denim.", level:"Actress", logo:"https://logo.clearbit.com/levi.com"},
+  {company:"Deepika Padukone", owner:"Axis Bank", fact:"Third-largest private sector bank in India.", level:"Actress", logo:"https://logo.clearbit.com/axisbank.com"},
+  {company:"Katrina Kaif", owner:"Reeboks", fact:"Sportswear and footwear brand.", level:"Actress", logo:"https://logo.clearbit.com/reebok.com"},
+  {company:"Katrina Kaif", owner:"Slice (PepsiCo)", fact:"Mango-flavored fruit drink.", level:"Actress", logo:"https://logo.clearbit.com/pepsico.com"},
+  {company:"Priyanka Chopra", owner:"Bumble", fact:"Dating and social networking app.", level:"Actress", logo:"https://logo.clearbit.com/bumble.com"},
+  {company:"Priyanka Chopra", owner:"Pantene", fact:"Shampoo and hair care brand.", level:"Actress", logo:""},
+  {company:"Anushka Sharma", owner:"Manyavar Mohey", fact:"Indian traditional wear brand.", level:"Actress", logo:""},
+  {company:"Kareena Kapoor Khan", owner:"Puma", fact:"Sportswear brand.", level:"Actress", logo:"https://logo.clearbit.com/puma.com"},
+  {company:"Sara Ali Khan", owner:"Veet", fact:"Depilatory hair removal products.", level:"Actress", logo:""},
+  {company:"Kriti Sanon", owner:"Joy Personal Care", fact:"Skincare and personal grooming products.", level:"Actress", logo:""},
+  {company:"Shraddha Kapoor", owner:"The Body Shop", fact:"Ethical beauty and skin care.", level:"Actress", logo:"https://logo.clearbit.com/thebodyshop.com"},
+  {company:"Kiara Advani", owner:"OnePlus India", fact:"Chinese mobile phone manufacturer.", level:"Actress", logo:"https://logo.clearbit.com/oneplus.com"},
+
+  // *** INFLUENCERS / OTHER CELEBS ***
+  {company:"Bhuvan Bam (BB Ki Vines)", owner:"Mcdowell's No.1 Soda", fact:"Beverage mixer brand.", level:"Influencer", logo:""},
+  {company:"Prajakta Koli (MostlySane)", owner:"Google Assistant", fact:"AI-powered virtual assistant.", level:"Influencer", logo:"https://logo.clearbit.com/google.com"},
+  {company:"Ashneer Grover (Shark Tank)", owner:"Mufin Green Finance", fact:"NBFC focused on electric vehicles.", level:"Influencer", logo:""},
+  {company:"Masaba Gupta (Designer)", owner:"L'Oréal Paris", fact:"Global beauty and personal care company.", level:"Actress", logo:"https://logo.clearbit.com/loreal.com"},
+  {company:"Kunal Shah (CRED founder)", owner:"CRED (Self-Promo)", fact:"Financial rewards platform.", level:"Influencer", logo:"https://logo.clearbit.com/cred.club"},
+  {company:"Ghazal Alagh (Mamaearth founder)", owner:"Mamaearth (Self-Promo)", fact:"Natural baby and personal care brand.", level:"Influencer", logo:""},
+  {company:"Mithila Palkar", owner:"Cadbury Dairy Milk", fact:"Popular chocolate brand.", level:"Influencer", logo:""},
+];
+
+// Reusing the script logic from the original learn.html
+const rowsPerPage = 10;
+let currentPage = 1, filtered = companies.slice();
+const tableBody = document.querySelector('#learnTable tbody');
+const pagination = document.getElementById('pagination');
+const tableInfo = document.getElementById('tableInfo');
+const searchInput = document.getElementById('searchInput');
+let currentLevel = "All";
+
+// Render table
+function renderTable(){
+  const start = (currentPage-1)*rowsPerPage;
+  const pageItems = filtered.slice(start, start+rowsPerPage);
+  tableBody.innerHTML = '';
+  pageItems.forEach((c, idx)=>{
+    const seq = start+idx+1;
+    const logoSrc = c.logo || initialsSVG(c.owner); // Using owner for logo fallback here
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${seq}</td>
+      <td><span class="mini-logo"><img src="${logoSrc}" alt="" onerror="this.onerror=null; this.src='${initialsSVG(c.owner)}'"></span>${c.company} (${c.level})</td>
+      <td>${c.owner||'—'}</td>
+      <td>${c.fact||'—'}</td>`;
+    tableBody.appendChild(tr);
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length/rowsPerPage));
+  pagination.innerHTML = '';
+  pagination.appendChild(makePageBtn('Prev',()=>{if(currentPage>1){currentPage--; renderTable();}}));
+
+  const windowSize = 5;
+  let startPage = Math.max(1,currentPage-Math.floor(windowSize/2));
+  let endPage = Math.min(totalPages,startPage+windowSize-1);
+  if(endPage-startPage<windowSize-1) startPage = Math.max(1,endPage-windowSize+1);
+
+  for(let p=startPage;p<=endPage;p++){
+    const btn = makePageBtn(p,()=>{currentPage=p;renderTable();});
+    if(p===currentPage) btn.style.fontWeight='800';
+    pagination.appendChild(btn);
+  }
+
+  pagination.appendChild(makePageBtn('Next',()=>{if(currentPage<totalPages){currentPage++;renderTable();}}));
+
+  tableInfo.textContent = `Showing ${Math.min(filtered.length,start+1)}-${Math.min(filtered.length,start+rowsPerPage)} of ${filtered.length} celebrities`;
+}
+function makePageBtn(label,onClick){ const b=document.createElement('button'); b.className='page-btn'; b.textContent=label; b.onclick=onClick; return b; }
+
+// Search & Filter
+searchInput.addEventListener('input', filterAndRender);
+document.querySelectorAll('.level-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentLevel = btn.dataset.level;
+    filterAndRender();
+  });
+});
+
+function filterAndRender(){
+  const q = searchInput.value.trim().toLowerCase();
+  filtered = companies.filter(c=>{
+    const matchesLevel = (currentLevel==="All") || (c.level===currentLevel);
+    const matchesSearch = (c.company||'').toLowerCase().includes(q) ||
+                          (c.owner||'').toLowerCase().includes(q) ||
+                          (c.fact||'').toLowerCase().includes(q) ||
+                          (c.level||'').toLowerCase().includes(q);
+    return matchesLevel && matchesSearch;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+// Animated background circles (copied from original)
+for(let i=0;i<10;i++){
+  const circle=document.createElement('div');
+  circle.className='bg-circle';
+  const size=Math.random()*200+50;
+  circle.style.width=circle.style.height=size+'px';
+  circle.style.left=Math.random()*100+'%';
+  circle.style.top=Math.random()*100+'%';
+  circle.style.background=['#ffd166','#7af0c9','#60a5fa','#a78bfa','#ffb86b'][Math.floor(Math.random()*5)];
+  circle.style.animationDuration=(10+Math.random()*10)+'s';
+  document.body.appendChild(circle);
+}
+
+
+renderTable();
+</script>
+</body>
+</html>
