@@ -268,6 +268,25 @@ button.ghost{
         flex-grow: 1; /* Allow buttons to grow and fill space */
     }
 }
+/* Apply the background to the entire page canvas */
+html {
+    min-height: 100vh; /* Ensures it covers the full viewport height */
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+}
+
+/* Keep your existing body styles, just without the background */
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: #e6eef8;
+    min-height: 100vh; /* Good to keep this as well */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    position: relative;
+}
+
 </style>
 </head>
 <body>
