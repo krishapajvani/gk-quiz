@@ -1,6 +1,8 @@
 Who Owns It? - CMAT GK Quiz
 A dynamic and responsive quiz application designed to help users prepare for the CMAT exam by testing their knowledge on company founders, celebrity-owned brands, and IPL team owners.
 
+To see live  :  https://krishapajvani.github.io/gk-quiz/
+
 🚀 About This Project
 This project is a modern, front-end quiz platform built with vanilla HTML, CSS, and JavaScript. It provides an interactive and engaging way for users to learn and test their general knowledge. The application features a sleek "glassmorphism" UI, dynamic question filtering, and a persistent leaderboard that saves scores locally in the user's browser.
 
