@@ -141,11 +141,11 @@ body {
 ol { padding-left:20px; margin-top:8px; }
 
 .bg-circle {
-  position:relative;
+  position:fixed;
   border-radius:50%;
   opacity:0.1;
   animation: float 15s infinite linear;
-  z-index: -1;
+  z-index: 1;
 }
 @keyframes float {
   0% { transform: translateY(0px) rotate(0deg);}
